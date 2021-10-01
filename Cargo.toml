@@ -1,0 +1,35 @@
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package]
+name = "s3d"
+version = "0.0.1-alpha4"
+edition = "2018"
+license = "Apache-2.0"
+description = "s3d is an S3 daemon for the Edge written in Rust. The goal of s3d is to provide a daemon for edge platforms (e.g. factory servers  🏭  planes  🛩  ships  🚢  cars  🏎  laptops  💻  mobile devices  📱  wearables  ⌚  ...) that connect to a central object storage (aka Hub). Since edge applications operate in subideal environments (high latency network, disconnections, hardware failures, eavesdropping, ...), s3d aims to make the applications run smoothly while it handles the flows of data, security, networking, local capacity, metadata caching, write queueing, etc."
+homepage = "https://github.com/s3d-rs/s3d"
+repository = "https://github.com/s3d-rs/s3d"
+keywords = ["s3", "edge", "object", "storage", "bucket"]
+categories = ["database-implementations", "filesystem", "web-programming::http-server"]
+authors = ["guymguym"]
+
+[badges]
+maintenance = { status = "experimental" }
+
+[profile.dev]
+panic = 'abort'
+
+[dependencies]
+
+tokio = { version = "1.12.0", features = ["full"] }
+hyper = { version = "0.14.13", features = ["full"] }
+uuid = { version = "0.8.2", features = ["v4"] }
+async-trait = "0.1.51"
+clap = "3.0.0-beta.4"
+serde = "1.0.130"
+serde_yaml = "0.8.21"
+serde_json = "1.0.68"
+fuser = "0.9.1"
+
+# aws-types = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.18-alpha", package = "aws-types" }
+# aws-config = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.18-alpha", package = "aws-config" }
+# aws-sdk-s3 = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.18-alpha", package = "aws-sdk-s3" }
