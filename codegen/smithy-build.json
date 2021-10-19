@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "projections": {
+    "s3": {
+      "imports": ["../smithy-rs/aws/sdk/aws-models/s3.json"],
+      "plugins": {
+        "rust-server-codegen": {
+          "runtimeConfig": {
+            "relativePath": "../../smithy-rs/rust-runtime"
+          },
+          "service": "com.amazonaws.s3#AmazonS3",
+          "module": "codegen-server-s3",
+          "moduleVersion": "0.0.0",
+          "moduleAuthors": ["codegen@s3d.rs"],
+          "moduleDescription": "codegen-server-s3"
+        },
+        "rust-codegen": {
+          "runtimeConfig": {
+            "relativePath": "../../smithy-rs/rust-runtime"
+          },
+          "codegen": {
+            "includeFluentClient": true,
+            "renameErrors": false,
+            "eventStreamAllowList": [
+              "aws-sdk-transcribestreaming",
+              "aws-sdk-s3"
+            ]
+          },
+          "service": "com.amazonaws.s3#AmazonS3",
+          "module": "codegen-client-s3",
+          "moduleVersion": "0.0.0",
+          "moduleAuthors": ["codegen@s3d.rs"],
+          "moduleDescription": "codegen-client-s3"
+        }
+      }
+    }
+  }
+}

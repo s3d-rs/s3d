@@ -1,0 +1,40 @@
+# TODO: Work in progress
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s3d
+  labels:
+    app: s3d
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3d
+  template:
+    metadata:
+      labels:
+        app: s3d
+    spec:
+      containers:
+      - name: s3d
+        image: s3d
+        ports:
+        - containerPort: 33333
+        env:
+        - name: TODO
+          value: "Work in progress"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: s3d
+  labels:
+    app: s3d
+spec:
+  type: NodePort
+  selector:
+    app: s3d
+  ports:
+  - port: 33333
+    targetPort: 33333

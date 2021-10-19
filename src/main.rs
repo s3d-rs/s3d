@@ -2,60 +2,36 @@
 //! - https://s3d.rs
 //! - https://github.com/s3d-rs/s3d
 
-use clap::{AppSettings, Clap};
-use std::error::Error;
+pub mod cli;
+pub mod client;
+pub mod conf;
+pub mod daemon;
+pub mod gen;
+pub mod proto;
+pub mod resources;
+pub mod router;
+pub mod store;
 
-type AnyError = Box<dyn Error + Send + Sync>;
-type ResultOrAnyErr<T> = Result<T, AnyError>;
+// pub mod fuse;
 
-#[derive(Clap, Debug)]
-#[clap(about = "s3d is an S3 daemon for the Edge written in Rust.")]
-#[clap(setting = AppSettings::ColoredHelp)]
-struct CLI {
-    /// Sets a custom config file
-    #[clap(short, long)]
-    config: Option<String>,
+#[macro_use]
+extern crate log;
 
-    /// Verbosity level, can be used multiple times
-    #[clap(short, long, parse(from_occurrences))]
-    verbose: i32,
+#[macro_use]
+extern crate clap;
 
-    /// Cli command
-    #[clap(subcommand)]
-    cmd: Cmd,
-}
+#[macro_use]
+extern crate anyhow;
 
-#[derive(Clap, Debug)]
-enum Cmd {
-    Run(RunCmd),
-}
-
-#[derive(Clap, Debug)]
-struct RunCmd {
-    #[clap(short)]
-    debug: bool,
-}
+use crate::cli::CLI;
 
 #[tokio::main]
-pub async fn main() -> ResultOrAnyErr<()> {
-    let cli: CLI = CLI::parse();
-
-    if cli.verbose > 0 {
-        println!("[VERBOSE] CLI options: {:?}", cli);
+pub async fn main() -> anyhow::Result<()> {
+    match CLI::run().await {
+        Ok(_) => Ok(()),
+        Err(err) => {
+            error!("{}", err);
+            std::process::exit(1);
+        }
     }
-
-    match cli.cmd {
-        Cmd::Run(c) => Ok(run().await?),
-    }
-}
-
-async fn run() -> ResultOrAnyErr<()> {
-    println!("run: start ...");
-    for i in 1..10 {
-        println!("run: {}", i);
-        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
-    }
-    println!("run: done.");
-
-    Ok(())
 }

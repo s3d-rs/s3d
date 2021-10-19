@@ -1,1 +1,4 @@
-/target
+/target/
+/codegen/build/
+/.s3d/
+.IGNORE
