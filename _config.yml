@@ -4,10 +4,11 @@ plugins:
 - jekyll-remote-theme
 title: s3d.rs
 minima:
-  skin: dark
+  skin: classic
   social_links:
     github: s3d-rs
 header_pages:
-  - docs/commands.md
+  - docs/architecture.md
   - docs/config.md
-  - docs/examples.md
+  - docs/dev.md
+  - docs/roadmap.md

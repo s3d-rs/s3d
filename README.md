@@ -1,19 +1,23 @@
 <div id="top"></div>
-<div align="center" style="display: block; background-color: black; text-align: center">
-  <a alt="s3d logo" href="https://s3d.rs" style="display: block; background-color: black; text-align: center">
-    <img alt="s3d" src="s3d.png" width="200" />
+<div align="center" style="background-color: hsla(0,0,0%,0.1); text-align: center">
+  <a alt="s3d logo" href="https://s3d.rs" style="background-color: hsla(0,0,0%,0.1); text-align: center">
+    <img alt="s3d" src="s3d.png" width="250" />
   </a>
 </div>
 <br />
 <div align="center">
   <a alt="crate" href="https://crates.io/crates/s3d">
-    <img src="https://img.shields.io/crates/v/s3d.svg?logo=rust&color=success" />
-  </a>
-  <a alt="license" href="LICENSE">
-    <img src="https://img.shields.io/badge/license-Apache--2.0-success.svg" />
+    <img src="https://img.shields.io/crates/v/s3d.svg?color=success&logo=rust&logoColor=white" />
   </a>
   <a alt="build" href="https://github.com/s3d-rs/s3d/actions">
-    <img src="https://github.com/s3d-rs/s3d/workflows/build/badge.svg" />
+    <!-- <img src="https://github.com/s3d-rs/s3d/workflows/build/badge.svg" /> -->
+    <img src="https://img.shields.io/github/checks-status/s3d-rs/s3d/main?logo=github&logoColor=white" />
+  </a>
+  <a alt="discord" href="https://discord.com/channels/897764851580035072">
+    <img src="https://img.shields.io/discord/897764851580035072?color=success&logo=discord&logoColor=white" />
+  </a>
+  <a alt="license" href="LICENSE">
+    <img src="https://img.shields.io/github/license/s3d-rs/s3d?color=success" />
   </a>
   <!--
   <a alt="releases" href="https://github.com/s3d-rs/s3d/releases/latest">
@@ -22,80 +26,88 @@
   <a alt="s3d at docs.rs" href="http://docs.rs/s3d">
     <img src="https://docs.rs/s3d/badge.svg" />
   </a>
-  <img src="https://img.shields.io/badge/build-WIP-yellow.svg" />
   -->
 </div>
-<br />
 
-# `s3d` is an S3 daemon for the Edge written in Rust
+# The S3 Daemon
 
-The _goal_ of `s3d` is to provide a daemon for edge platforms (e.g. factory servers  🏭  planes  🛩  ships  🚢  cars  🏎  laptops  💻  mobile devices  📱  wearables  ⌚  ...) that connect to a central object storage (aka Hub).
+`s3d` is a daemon for data access using S3 API. A modern cousin of `nfsd`, `ftpd`, `httpd`, etc. It is designed to be simple, tiny, blazing fast, and portable in order to fit in a variety of environments from developer machines, containers, kubernetes, edge devices, etc.
 
-Since edge applications operate in subideal environments (high latency network, disconnections, hardware failures, eavesdropping, ...), `s3d` aims to make the applications run smoothly while it handles the flows of data, security, networking, local capacity, metadata caching, write queueing, etc.
+By default, `s3d` serves the S3 API as a gateway to a main remote S3 storage (AWS/compatible), with ultimate protocol compatiblity (based on the AWS SDK and Smithy API), it adds critical features needed by remote clients such as queueing, caching, and synching, in order to optimize performance, increase data availability, and service continuity for its clients.
 
-Worth mentioning that the choice of the Rust language is a natural fit for the edge systems, as it is a modern language with a focus on functionality, safety and performance. `s3d` builds with the rust toolchain into a single binary that loads a yaml config file, which makes it easy to set up and configure in standalone linux or containerized environments like Kubernetes.
+The need for a daemon running locally with client applications emerges in Edge computing use cases, where data is stored and processed locally at the edge as it gets collected, while some of the data gets synced to and from a main data storage (read more on [Wikipedia - Edge computing](https://en.wikipedia.org/wiki/Edge_computing)):
 
-# Info
+> Edge computing is a distributed computing paradigm that brings computation and _data storage closer to the sources of data_.
+> This is expected to improve response times and save bandwidth.
 
-This project is still  **🛸🛸🛸  Experimental  🚀🚀🚀**
+# Features
 
-This means it's a great time to affect its direction!
+1. **S3 API**
+   - Generated S3 protocol code with [awslabs/smithy-rs](https://github.com/awslabs/smithy-rs) which builds the AWS SDK for Rust.
+   - Provides compatible parsing of API operations, inputs, outputs, errors, and the server skeleton.
+1. **UPLOAD QUEUE**
+   - Writing new objects to local filesystem first to tolerate connection issues.
+   - Pushing in the background to remote storage.
+1. **READ CACHE**
+   - Store cached and prefetched objects in local filesystem.
+   - Reduce egress costs and latency of reads from remote storage.
+1. **SYNC DIR**
+   - Continuous, bidirectional and background sync of local dirs to remote buckets.
+   - This is a simple way to get data that begins as local files to the remote S3 storage.
+1. **FUSE MOUNT**
+   - Virtual filesystem mountpoint provided by the daemon (see [kernel fuse docs](https://www.kernel.org/doc/html/latest/filesystems/fuse.html)).
+   - The filesystem can be accessed normally for applications that do not use the S3 API.
+1. **FILTERS**
+   - Fine control over which objects to include/exclude for upload/cache/sync.
+   - Filter by bucket name, bucket tags, object keys (or prefixes), object tags, and object meta-data.
+   - Optional integration with [OpenPolicyAgent (OPA)](https://www.openpolicyagent.org) for advanced filtering.
+1. **MONITORING**
+   - Optional integration with [OpenTelemetry](https://opentelemetry.io).
+   - Expose logging, metrics, and tracing of S3 operations and `s3d` features.
 
-If you find it interesting or want to contribute, please feel free to communicate using these options:
+# Getting Started
 
-- [Discord Chat](https://discord.gg/kPWHDuCdhh) - join to discussion channels
-- [Github Issues](https://github.com/s3d-rs/s3d/issues) - for bugs/questions/disccussions/suggestions
-- [Github PR's](https://github.com/s3d-rs/s3d/pulls) - add features/fixes/improvements (prefer to have an issue open first)
-- [Github Projects](https://github.com/s3d-rs/s3d/projects) - track roadmap/progress
-- [License](https://github.com/s3d-rs/s3d/blob/main/LICENSE) - Apache-2.0
+The following snippet is a good starting point for getting started with `s3d`.
 
-# Docs
+The [rust tools](https://www.rust-lang.org/tools/install) are required for installing `s3d` from crates.io.
 
-- [Commands](docs/commands.md)
-- [Config](docs/config.md)
-- [Examples](docs/examples.md)
-
-# Quick start
-
-To start using `s3d` you need to install it, run it, and configure your data workflows.
-
-The following steps illustrate a basic flow of s3d usage:
-
-```sh
-# Install the s3d binary using Rust toolchain
-cargo install s3d
-
-# Sets up the configuration, hub connection, and local storage
-s3d init
-
-# Run the daemon to serve S3 clients can connect to read and write objects
-# Start and stop will spawn/kill the daemon in the background
-s3d run
-s3d start
-s3d stop
-
-# Fetch reads metadata from the hub and stores locally
-# This includes the list of objects and their metadata, but excludes objects contents
-s3d fetch [bucket/prefix]
-
-# Pull is like fetch but includes objects contents.
-s3d pull [bucket/prefix]
-
-# Simple access to objects from the CLI
-s3d get bucket/key > file
-s3d put bucket/key < file
-s3d ls [bucket/prefix]
-
-# Show local changes not pushed to the hub
-s3d diff [bucket/prefix]
-
-# Show bucket status and local store stats (objects, sizes, etc).
-s3d status [bucket/prefix]
-
-# Push bucket changes (merge by last modified time).
-s3d push [bucket/prefix]
-
-# Remove objects from local store based on age
-s3d prune [bucket/prefix]
+```bash
+cargo install s3d # install latest from crates.io
+s3d run           # runs daemon in foreground ...
+s3d status        # check the daemon status
+s3d status bucket/key     # check bucket or object status
+s3d ls bucket/prefix      # list buckets or objects
+s3d get bucket/key > file # get object data to stdout (meta-data to stderr)
+s3d put bucket/key < file # put object data from stdin
+s3d set bucket/key --tag s3d.upload=true --tag s3d.cache=pin # set tags for object
+s3d help          # for more information
 ```
 
+# Usage
+
+- [User guide](docs/user-guide.md) - help on features, configurations and environment variables.
+
+# Development
+
+- [Developer guide](docs/developer-guide.md) - describes how source control, building and testing works.
+
+# Architecture
+
+- [Architecture page](docs/architecture.md) - describes key components and concepts.
+
+# Roadmap
+
+- [Roadmap page](docs/roadmap.md) - directions for future development.
+
+# Project
+
+> :telescope: &nbsp; **Experimental status warning** &nbsp; :warning:
+>
+> This project is still in it's early days, which means it's a great time to affect its direction, and we welcome contributions and open discussions.
+>
+> Keep in mind that all internal and external interfaces are considered unstable and subject to change without notice.
+
+- [Github issues](https://github.com/s3d-rs/s3d/issues) - please let us know on any issues/question/suggestion.
+- [Discord chat](https://discord.com/channels/897764851580035072) - use this [invite link](https://discord.gg/kPWHDuCdhh) to join.
+- [Redhat-et](https://github.com/redhat-et) - this project was initiated by Red Hat Emerging Technologies.
+- [License](LICENSE) - Apache 2.0
