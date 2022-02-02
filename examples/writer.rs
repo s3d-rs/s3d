@@ -2,12 +2,11 @@
 //! with options to repeat/concurrency/more. It simulates an edge device
 //! such as a sensor or a camera that sends data to s3d.
 
+use aws_sdk_s3::{types::ByteStream, Credentials, Endpoint, Region};
 use bytes::BytesMut;
 use clap::Parser;
-use codegen_client_s3::{Builder, Client, Config, ByteStream};
 use hyper::Uri;
 use std::str::FromStr;
-// use aws_sdk_s3::{ByteStream, Credentials, Endpoint, Region};
 
 #[macro_use]
 extern crate log;
@@ -56,22 +55,16 @@ pub async fn main() -> anyhow::Result<()> {
     let bucket = cli.bucket.as_str();
     let prefix = cli.prefix.as_str();
 
-    // let s3c = aws_sdk_s3::Client::from_conf({
-    //     let ep = Endpoint::immutable(Uri::from_str(endpoint).unwrap());
-    //     let creds = Credentials::new("s3d", "s3d", None, None, "s3d");
-    //     let region = Region::new("s3d");
-    //     aws_sdk_s3::Config::builder()
-    //         .endpoint_resolver(ep)
-    //         .credentials_provider(creds)
-    //         .region(region)
-    //         .build()
-    // });
-
-    let raw_client = Builder::dyn_https()
-        .middleware_fn(|r| r)
-        .build();
-    let config = Config::builder().build();
-    let s3c = Client::with_config(raw_client, config);
+    let s3c = aws_sdk_s3::Client::from_conf({
+        let ep = Endpoint::immutable(Uri::from_str(endpoint).unwrap());
+        let creds = Credentials::new("s3d", "s3d", None, None, "s3d");
+        let region = Region::new("s3d");
+        aws_sdk_s3::Config::builder()
+            .endpoint_resolver(ep)
+            .credentials_provider(creds)
+            .region(region)
+            .build()
+    });
 
     let _r = s3c.head_bucket().bucket(bucket).send().await?;
     info!("head_bucket: OK bucket {} exists", bucket);

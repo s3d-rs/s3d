@@ -1,0 +1,8 @@
+target
+build
+
+.s3d
+.IGNORE
+.gradle
+
+!smithy-rs/s3d/build/crates

@@ -34,22 +34,22 @@ To check and report the status of the daemon and the remote S3 storage, use:
 s3d status
 ```
 
-# Upload-queue
+# Write-queue
 
 Environment variables:
 
-- `S3D_UPLOAD_QUEUE` - true/false, default false.
-- `S3D_UPLOAD_QUEUE_DIR` - directory to store the queue, default `$S3D_LOCAL_DIR/upload-queue`.
-- `S3D_UPLOAD_QUEUE_FILTER` - object filter to push, default all.
-- `S3D_UPLOAD_QUEUE_MAX_SIZE` - maximum size of the queue in bytes, default 1GB.
-- `S3D_UPLOAD_QUEUE_MAX_FILES` - maximum number of files in the queue, default 100.
-- `S3D_UPLOAD_QUEUE_MAX_AGE` - maximum age of uploads in the queue in seconds, default 3600.
+- `S3D_WRITE_QUEUE` - true/false, default false.
+- `S3D_WRITE_QUEUE_DIR` - directory to store the queue, default `$S3D_LOCAL_DIR/write_queue`.
+- `S3D_WRITE_QUEUE_FILTER` - object filter to push, default all.
+- `S3D_WRITE_QUEUE_MAX_SIZE` - maximum size of the queue in bytes, default 1GB.
+- `S3D_WRITE_QUEUE_MAX_FILES` - maximum number of files in the queue, default 100.
+- `S3D_WRITE_QUEUE_MAX_AGE` - maximum age of writes in the queue in seconds, default 3600.
 
 When enabled, `s3d` first writes new objects to files in the local store, and will push them to the main storage in the background. This is to mitigate connection issues and improve performance.
 
-When the limits are exceeded, new upload requests will not be added to the queue, instead it will wait for pending uploads to push and make room for it.
+When the limits are exceeded, new write requests will not be added to the queue, instead it will wait for pending writes to push and make room for it.
 
-See filters syntax for fine grain control of which data to push. In order to dynamically change the filtering of an object that was not pushed, use put-object-tagging which can be used on an existing in the uploads queue.
+See filters syntax for fine grain control of which data to push. In order to dynamically change the filtering of an object that was not pushed, use put-object-tagging which can be used on an existing in the write queue.
 
 # Read-cache
 
@@ -95,7 +95,7 @@ The following environment variables can be used to configure the fuse-mount:
 
 # Filters
 
-By default, `s3d` will include all objects eligible for upload-queue, read-cache, and sync-folder. However for fine control over which objects to include, filters can be configured.
+By default, `s3d` will include all objects eligible for write-queue, read-cache, and sync-folder. However for fine control over which objects to include, filters can be configured.
 
 Here are a few examples of a filters syntax:
 

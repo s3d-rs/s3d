@@ -50,6 +50,7 @@ quote = "1.0.15"
 anyhow = "1.0.53"
 async-trait = "0.1.52"
 proc-macro2 = "1.0.36"
+lazy_static = "1.4.0"
 
 ## General purpose crates
 
@@ -59,7 +60,7 @@ chrono = "0.4.19"
 url = "2.2.2"
 urlencoding = "2.1.0"
 uuid = { version = "0.8.2", features = ["v4"] }
-clap = { version = "3.0.12", features = ["derive"] }
+clap = { version = "3.0.12", features = ["derive", "cargo"] }
 
 ## Encoding/decoding crates
 
@@ -69,23 +70,40 @@ envy = "0.4.2"
 #serde_json = "1.0.78"
 #quick-xml = "0.22.0" # seems to be more popular than other serde_xml* crates
 
-## smithy-rs crates (git submodule)
+## aws smithy crates
 
-aws-smithy-client = { path = "smithy-rs/rust-runtime/aws-smithy-client", features = ["client-hyper"] }
-aws-smithy-types = { path = "smithy-rs/rust-runtime/aws-smithy-types" }
-aws-smithy-xml = { path = "smithy-rs/rust-runtime/aws-smithy-xml" }
-aws-smithy-http = { path = "smithy-rs/rust-runtime/aws-smithy-http" }
-aws-smithy-http-tower = { path = "smithy-rs/rust-runtime/aws-smithy-http-tower" }
-aws-smithy-http-server = { path = "smithy-rs/rust-runtime/aws-smithy-http-server" }
+aws-smithy-client = { version = "0.36.0", features = ["client-hyper"] }
+aws-smithy-types = "0.36.0"
+aws-smithy-xml = "0.36.0"
+aws-smithy-http = "0.36.0"
+aws-smithy-http-tower = "0.36.0"
+aws-smithy-http-server = "0.36.0"
+aws-http = "0.6.0"
+aws-types = "0.6.0"
+aws-sigv4 = "0.6.0"
+aws-sig-auth = "0.6.0"
+aws-endpoint = "0.6.0"
+aws-config = "0.6.0"
+aws-sdk-s3 = "0.6.0"
+s3d-smithy-codegen-server-s3 = "0.0.1"
 
-aws-http = { path = "smithy-rs/aws/rust-runtime/aws-http" }
-aws-types = { path = "smithy-rs/aws/rust-runtime/aws-types" }
-aws-sigv4 = { path = "smithy-rs/aws/rust-runtime/aws-sigv4" }
-aws-sig-auth = { path = "smithy-rs/aws/rust-runtime/aws-sig-auth" }
-aws-endpoint = { path = "smithy-rs/aws/rust-runtime/aws-endpoint" }
+## patching to use local overides of the smithy-rs crates
+## can also be added in another file `.cargo/config.toml`
+## see https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html
 
-#aws-config = { path = "smithy-rs/aws/rust-runtime/aws-config" }
-#aws-config = "0.5.2"
+[patch.crates-io]
 
-codegen-server-s3 = { path = "codegen/codegen-server-s3" }
-codegen-client-s3 = { path = "codegen/codegen-client-s3" }
+aws-smithy-client = { path = "smithy-rs/s3d/build/crates/aws-smithy-client" }
+aws-smithy-types = { path = "smithy-rs/s3d/build/crates/aws-smithy-types" }
+aws-smithy-xml = { path = "smithy-rs/s3d/build/crates/aws-smithy-xml" }
+aws-smithy-http = { path = "smithy-rs/s3d/build/crates/aws-smithy-http" }
+aws-smithy-http-tower = { path = "smithy-rs/s3d/build/crates/aws-smithy-http-tower" }
+aws-smithy-http-server = { path = "smithy-rs/s3d/build/crates/aws-smithy-http-server" }
+aws-http = { path = "smithy-rs/s3d/build/crates/aws-http" }
+aws-types = { path = "smithy-rs/s3d/build/crates/aws-types" }
+aws-sigv4 = { path = "smithy-rs/s3d/build/crates/aws-sigv4" }
+aws-sig-auth = { path = "smithy-rs/s3d/build/crates/aws-sig-auth" }
+aws-endpoint = { path = "smithy-rs/s3d/build/crates/aws-endpoint" }
+aws-config = { path = "smithy-rs/s3d/build/crates/aws-config" }
+aws-sdk-s3 = { path = "smithy-rs/s3d/build/crates/s3" }
+s3d-smithy-codegen-server-s3 = { path = "smithy-rs/s3d/build/crates/s3d-smithy-codegen-server-s3" }
