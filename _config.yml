@@ -8,7 +8,7 @@ minima:
   social_links:
     github: s3d-rs
 header_pages:
+  - docs/user-guide.md
+  - docs/developer-guide.md
   - docs/architecture.md
-  - docs/config.md
-  - docs/dev.md
   - docs/roadmap.md

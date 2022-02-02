@@ -45,7 +45,7 @@ The need for a daemon running locally with client applications emerges in Edge c
 1. **S3 API**
    - Generated S3 protocol code with [awslabs/smithy-rs](https://github.com/awslabs/smithy-rs) which builds the AWS SDK for Rust.
    - Provides compatible parsing of API operations, inputs, outputs, errors, and the server skeleton.
-1. **UPLOAD QUEUE**
+1. **WRITE QUEUE**
    - Writing new objects to local filesystem first to tolerate connection issues.
    - Pushing in the background to remote storage.
 1. **READ CACHE**
@@ -72,7 +72,7 @@ The following snippet is a good starting point for getting started with `s3d`.
 The [rust tools](https://www.rust-lang.org/tools/install) are required for installing `s3d` from crates.io.
 
 ```bash
-cargo install s3d # install latest from crates.io
+cargo install s3d # install latest from crates.io  (TODO: crate not published yet...)
 s3d run           # runs daemon in foreground ...
 s3d status        # check the daemon status
 s3d status bucket/key     # check bucket or object status
@@ -101,13 +101,14 @@ s3d help          # for more information
 
 # Project
 
-> :telescope: &nbsp; **Experimental status warning** &nbsp; :warning:
+> 🔭 &nbsp; **Experimental status warning** &nbsp; ⚠️
 >
 > This project is still in it's early days, which means it's a great time to affect its direction, and we welcome contributions and open discussions.
 >
 > Keep in mind that all internal and external interfaces are considered unstable and subject to change without notice.
 
-- [Github issues](https://github.com/s3d-rs/s3d/issues) - please let us know on any issues/question/suggestion.
+- Click **Watch** on the github repo to get notifications on new releases, issues, etc.
+- [Github issues](https://github.com/s3d-rs/s3d/issues) - please let us know if you have any issues/question/suggestion.
 - [Discord chat](https://discord.com/channels/897764851580035072) - use this [invite link](https://discord.gg/kPWHDuCdhh) to join.
 - [Redhat-et](https://github.com/redhat-et) - this project was initiated by Red Hat Emerging Technologies.
 - [License](LICENSE) - Apache 2.0

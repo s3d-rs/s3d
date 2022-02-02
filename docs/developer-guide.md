@@ -7,32 +7,30 @@ title: Developer Guide
 Clone from repo (use a fork if you want to contribute back upstream):
 
 ```bash
-git clone --recurse-submodules https://github.com/s3d-rs/s3d.git
+git clone https://github.com/s3d-rs/s3d.git
 cd s3d
 ```
 
-Build and execute in one command:
+Requried toolchains:
+- rust (cargo)
+- java (gradle)
 
+Build debug mode:
 ```bash
-cargo run -- <args>
+make
 ```
 
-Or in two commands:
-
+Run locally:
 ```bash
-cargo build
 ./target/debug/s3d <args>
 ```
 
-Additional developer scripts are in `hack/` dir, most useful is the env script loaded to your shell:
-
+Developer scripts are in `hack/` dir, most useful is the env script loaded to your shell:
 ```bash
 source hack/env.sh
 ```
 
-In order to update and build the smithy-rs submodule, you need to have `java` and run:
-
+Build release mode:
 ```bash
-hack/smithy-update.sh # updates the smithy-rs submodule HEAD
-hack/smithy-build.sh # builds smithy-rs and codegen for S3 API
+make RELEASE=1
 ```
