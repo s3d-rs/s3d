@@ -2,6 +2,11 @@
 title: User Guide
 ---
 
+> 🚧  &nbsp; **Warning - work in progress** &nbsp; 🚧
+>
+> This page is under development and most of the mentioned options are not yet available.\
+> Apologies for the inconvenience.
+
 # User Guide 
 
 To run the daemon in foreground:
@@ -34,7 +39,7 @@ To check and report the status of the daemon and the remote S3 storage, use:
 s3d status
 ```
 
-# Write-queue
+# Write Queue
 
 Environment variables:
 
@@ -51,12 +56,12 @@ When the limits are exceeded, new write requests will not be added to the queue,
 
 See filters syntax for fine grain control of which data to push. In order to dynamically change the filtering of an object that was not pushed, use put-object-tagging which can be used on an existing in the write queue.
 
-# Read-cache
+# Read Cache
 
 Environment variables:
 
 - `S3D_READ_CACHE` - true/false, default false.
-- `S3D_READ_CACHE_DIR` - directory to store the cache, default `$S3D_LOCAL_DIR/read-cache`.
+- `S3D_READ_CACHE_DIR` - directory to store the cache, default `$S3D_LOCAL_DIR/read_cache`.
 - `S3D_READ_CACHE_FILTER` - object filter to cache, default all.
 - `S3D_READ_CACHE_MAX_SIZE` - maximum size of the cache in bytes, default 1GB.
 - `S3D_READ_CACHE_MAX_FILES` - maximum number of files in the cache, default 100.
@@ -68,34 +73,9 @@ When the limits are exceeded, old items from the cache will be pruned before add
 
 See filters syntax for fine grain control of which data to cache.
 
-# Sync-folder
-
-When enabled, `s3d` will perform a continuous bidirectional background sync of the remote buckets with a local dir (aka "dropbox folder").
-
-The following environment variables can be used to configure the sync-folder:
-
-- `S3D_SYNC_FOLDER` - true/false, default false.
-- `S3D_SYNC_FOLDER_DIR` - directory to store the folder, default `$S3D_LOCAL_DIR/sync-folder`.
-- `S3D_SYNC_FOLDER_FILTER` - object filter to sync, default all.
-- `S3D_SYNC_FOLDER_MAX_SIZE` - maximum size of the folder in bytes, default 1GB.
-- `S3D_SYNC_FOLDER_MAX_FILES` - maximum number of files in the folder, default 100.
-- `S3D_SYNC_FOLDER_MAX_AGE` - maximum age of (unsync-ed) files in the folder in seconds, default 3600.
-
-When the limits are exceeded, sync will skip adding new data to the local folder.
-See filters syntax for fine grain control of which data to sync.
-
-# Fuse-mount
-
-When enabled, `s3d` will set up a FUSE mount point, which exposes the same buckets and objects through a POSIX-like file interface.
-
-The following environment variables can be used to configure the fuse-mount:
-
-- `S3D_FUSE_MOUNT` - true/false, default false.
-- `S3D_FUSE_MOUNT_DIR` - directory to bind the mount point, default `$S3D_LOCAL_DIR/fuse-mount`.
-
 # Filters
 
-By default, `s3d` will include all objects eligible for write-queue, read-cache, and sync-folder. However for fine control over which objects to include, filters can be configured.
+By default, `s3d` will include all objects eligible for write queueing, read caching, and folder syncing. However, for fine control over which objects to include, filters can be configured.
 
 Here are a few examples of a filters syntax:
 
@@ -127,14 +107,43 @@ s3api put-object-tagging --bucket bucket --key key --tagging '{"TagSet":[
 
 Notice that put-object-tagging is overriding the entire tag set, so in order to add a tag to existing set, you will need to use get-object-tagging, append to the TagSet array and then put-object-tagging.
 
-# Deploy
+# Sync Folder
 
-See examples of using `s3d` in container images and kubernetes yamls in `deploy/` dir:
+When enabled, `s3d` will perform a continuous bidirectional background sync of the remote buckets with a local dir (aka "dropbox folder").
 
+The following environment variables can be used to configure the sync-folder:
+
+- `S3D_SYNC_FOLDER` - true/false, default false.
+- `S3D_SYNC_FOLDER_DIR` - directory to store the folder, default `$S3D_LOCAL_DIR/sync_folder`.
+- `S3D_SYNC_FOLDER_FILTER` - object filter to sync, default all.
+- `S3D_SYNC_FOLDER_MAX_SIZE` - maximum size of the folder in bytes, default 1GB.
+- `S3D_SYNC_FOLDER_MAX_FILES` - maximum number of files in the folder, default 100.
+- `S3D_SYNC_FOLDER_MAX_AGE` - maximum age of (unsync-ed) files in the folder in seconds, default 3600.
+
+When the limits are exceeded, sync will skip adding new data to the local folder.
+See filters syntax for fine grain control of which data to sync.
+
+# Fuse Mount
+
+When enabled, `s3d` will set up a FUSE mount point, which exposes the same buckets and objects through a POSIX-like file interface.
+
+The following environment variables can be used to configure the fuse-mount:
+
+- `S3D_FUSE_MOUNT` - true/false, default false.
+- `S3D_FUSE_MOUNT_DIR` - directory to bind the mount point, default `$S3D_LOCAL_DIR/fuse_mount`.
+
+# Kubernetes Deployment
+
+Container image for s3d can be built using the `Dockerfile` in the project root (also used in `make image`):
 ```bash
-IMG="<username>/s3d:<tag>"
+IMG="<registry>/<user>/s3d:<tag>"
 docker build . -t $IMG
 docker push $IMG
-# update image in yaml ... TODO kustomize
-kubectl create -f deploy/s3d-kube-deploy.yaml
+```
+
+For Kubernetes see `examples/s3d-kube-deploy.yaml` which you can use as a base, just REMEMBER to set the image to match the one you built and pushed above. 
+
+```bash
+# set image in yaml ... TODO kustomize
+kubectl apply -f examples/s3d-kube-deploy.yaml
 ```
