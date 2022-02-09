@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: s3d
-        image: s3d
+        image: s3d:dev
         ports:
         - containerPort: 33333
         env:

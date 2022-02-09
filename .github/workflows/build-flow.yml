@@ -18,5 +18,5 @@ jobs:
         submodules: true
     - name: Install
       run: sudo apt-get install -y fuse libfuse-dev pkg-config
-    - name: Make
-      run: make full
+    - name: Make all
+      run: make all
