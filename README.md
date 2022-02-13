@@ -81,8 +81,12 @@ Maturity legend: 🥉 - design phase, 🥈 - development phase, 🥇 - released.
 # Status
 
 🧪🧪❕ &nbsp; **Experimental** \
-🧪🧪❕ &nbsp; This project is still in it's early days, which means it's a great time to affect its direction, and it welcomes contributions and open discussions. \
-🧪🧪❕ &nbsp; Keep in mind that all internal and external interfaces are considered unstable and might change without notice.
+🧪🧪❕ &nbsp; \
+🧪🧪❕ &nbsp; This project is still in it's early days, which means it's a great time \
+🧪🧪❕ &nbsp; to affect its direction, and it welcomes contributions and open discussions. \
+🧪🧪❕ &nbsp; \
+🧪🧪❕ &nbsp; Keep in mind that all internal and external interfaces are considered unstable \
+🧪🧪❕ &nbsp; and might change without notice.
 
 # Getting Started
 
