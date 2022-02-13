@@ -1,26 +1,34 @@
 <div id="top"></div>
 <div align="center">
-  <a alt="crate" href="https://crates.io/crates/s3d">
-    <img src="https://img.shields.io/crates/v/s3d.svg?color=success&logo=rust&logoColor=white" />
+  <!-- GItHUB -->
+  <a alt="github" href="https://github.com/s3d-rs/s3d">
+    <img src="https://img.shields.io/github/languages/code-size/s3d-rs/s3d?label=github&logo=github&color=lightblue" />
   </a>
   <a alt="build" href="https://github.com/s3d-rs/s3d/actions">
     <!-- <img src="https://github.com/s3d-rs/s3d/workflows/build/badge.svg" /> -->
-    <img src="https://img.shields.io/github/checks-status/s3d-rs/s3d/main?logo=github&logoColor=white" />
-  </a>
-  <a alt="discord" href="https://discord.com/channels/897764851580035072">
-    <img src="https://img.shields.io/discord/897764851580035072?color=success&logo=discord&logoColor=white" />
-  </a>
-  <a alt="license" href="LICENSE">
-    <img src="https://img.shields.io/github/license/s3d-rs/s3d?color=success" />
+    <img src="https://img.shields.io/github/workflow/status/s3d-rs/s3d/build/main?color=lightgreen" />
   </a>
   <!--
   <a alt="releases" href="https://github.com/s3d-rs/s3d/releases/latest">
     <img src="https://img.shields.io/github/v/release/s3d-rs/s3d" />
   </a>
+  -->
+  <!-- RUST -->
+  <a alt="crate" href="https://crates.io/crates/s3d">
+    <img src="https://img.shields.io/crates/v/s3d.svg?logo=rust&logoColor=white&color=lightgrey" />
+  </a>
+  <!--
   <a alt="s3d at docs.rs" href="http://docs.rs/s3d">
     <img src="https://docs.rs/s3d/badge.svg" />
   </a>
   -->
+  <!-- OTHER -->
+  <a alt="discord" href="https://discord.com/channels/897764851580035072">
+    <img src="https://img.shields.io/discord/897764851580035072?logo=discord&logoColor=white&label=discord&color=lightgreen" />
+  </a>
+  <a alt="license" href="LICENSE">
+    <img src="https://img.shields.io/github/license/s3d-rs/s3d?color=lightgreen" />
+  </a>
 </div>
 <br />
 <div align="center" style="background-color: hsla(0,0,0%,0.1); text-align: center">
@@ -72,11 +80,9 @@ Maturity legend: 🥉 - design phase, 🥈 - development phase, 🥇 - released.
 
 # Status
 
-> 🧪🧪 &nbsp; **Experimental** &nbsp; 🧪🧪
->
-> This project is still in it's early days, which means it's a great time to affect its direction, and it welcomes contributions and open discussions.
-> 
-> Keep in mind that all internal and external interfaces are considered unstable and might change without notice.
+🧪🧪❕ &nbsp; **Experimental** \
+🧪🧪❕ &nbsp; This project is still in it's early days, which means it's a great time to affect its direction, and it welcomes contributions and open discussions. \
+🧪🧪❕ &nbsp; Keep in mind that all internal and external interfaces are considered unstable and might change without notice.
 
 # Getting Started
 
