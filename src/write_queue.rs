@@ -49,7 +49,13 @@ impl WriteQueue {
         let key = parts.next().unwrap();
         let fname = format!("{}/{}", S3D_WRITE_QUEUE_DIR, entry_name);
         let body = ByteStream::from_path(Path::new(&fname)).await?;
-        self.s3_client.put_object().bucket(bucket).key(key).body(body).send().await?;
+        self.s3_client
+            .put_object()
+            .bucket(bucket)
+            .key(key)
+            .body(body)
+            .send()
+            .await?;
         tokio::fs::remove_file(fname).await?;
         info!("Write queue item: {:?}", bucket_path);
         Ok(())
@@ -75,9 +81,7 @@ impl WriteQueue {
         let fname = self.to_file_name(i.bucket(), i.key());
         let stream = ByteStream::from_path(Path::new(&fname))
             .await
-            .map_err(|err| {
-                GetObjectError::NoSuchKey(NoSuchKey::builder().build())
-            })?;
+            .map_err(|err| GetObjectError::NoSuchKey(NoSuchKey::builder().build()))?;
         Ok(GetObjectOutput::builder().set_body(Some(stream)).build())
     }
 
@@ -89,11 +93,11 @@ impl WriteQueue {
         Ok(HeadObjectOutput::builder().build())
     }
 
-    pub fn to_file_name(&self, bucket: Option<&str>, key: Option<&str>) -> String {
+    pub fn to_file_name(&self, bucket: &str, key: &str) -> String {
         format!(
             "{}/{}",
             S3D_WRITE_QUEUE_DIR,
-            urlencoding::encode(&format!("{}/{}", bucket.unwrap(), key.unwrap()))
+            urlencoding::encode(&format!("{}/{}", bucket, key))
         )
     }
 }

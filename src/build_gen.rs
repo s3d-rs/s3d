@@ -2,3 +2,4 @@
 #![allow(unused)]
 
 include!(concat!(env!("OUT_DIR"), "/s3_ops.rs"));
+include!(concat!(env!("OUT_DIR"), "/s3_conv.rs"));

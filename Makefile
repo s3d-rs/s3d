@@ -3,19 +3,27 @@ IMAGE := s3d:dev
 IMAGE_BUILDER := docker
 CODEGEN_CRATES_DIR := smithy-rs/s3d/build/crates
 CODEGEN_SERVER_S3 := $(CODEGEN_CRATES_DIR)/s3d-smithy-codegen-server-s3
-CARGO_BUILD_FLAGS += -v
+CODEGEN_SDK_DIR := smithy-rs/aws/sdk/build/aws-sdk/sdk
+CARGO_BUILD_FLAGS := 
 ifdef RELEASE
 	CARGO_BUILD_FLAGS += --release
 endif
+ifdef VERBOSE
+	CARGO_BUILD_FLAGS += -v
+endif
+
+LOG = @echo "\nMakefile: 🥷  $(1)\n"
+LOG_START = @echo "\nMakefile: 🥷  $@ start ...\n"
+LOG_DONE = @echo "\nMakefile: ✅ $@ done\n"
 
 #------------------------#
 # build - default target #
 #------------------------#
 
-build: codegen_if_missing
-	@echo "\nMakefile: 👷 running build ... \n"
+build: codegen_init_once
+	$(LOG_START)
 	$(TIMER) cargo build $(CARGO_BUILD_FLAGS)
-	@echo "\nMakefile: ✅ build done \n"
+	$(LOG_DONE)
 .PHONY: build
 
 #-----------------#
@@ -23,7 +31,7 @@ build: codegen_if_missing
 #-----------------#
 
 all: codegen build test
-	@echo "\nMakefile: ✅ all done \n"
+	$(LOG_DONE)
 .PHONY: all
 
 #----------------------#
@@ -31,30 +39,17 @@ all: codegen build test
 #----------------------#
 
 test:
-	@echo "\nMakefile: 👷 running test ... \n"
+	$(LOG_START)
 	$(TIMER) cargo test
-	@echo "\nMakefile: ✅ test done \n"
+	$(LOG_DONE)
 .PHONY: test
-
-#-----------------------------------------------------------------------#
-## codegen_if_missing - depend on output dir to trigger only if missing #
-#-----------------------------------------------------------------------#
-
-codegen_if_missing: | $(CODEGEN_SERVER_S3)
-.PHONY: codegen_if_missing
-
-$(CODEGEN_SERVER_S3):
-	@echo "\nMakefile: 👷 calling make codegen ... \n"
-	$(TIMER) $(MAKE) codegen
 
 #-----------------------------------#
 # codegen - generate with smithy-rs #
 #-----------------------------------#
 
-codegen:
-	@echo "\nMakefile: 👷 running codegen ... \n"
-	git submodule status
-	git submodule update --init
+codegen: submodules_init_once
+	$(LOG_START)
 	cd smithy-rs && $(TIMER) ./gradlew \
 		:rust-runtime:assemble \
 		:aws:sdk:assemble \
@@ -65,22 +60,64 @@ codegen:
 	rm -rf $(CODEGEN_CRATES_DIR)
 	mkdir -p $(CODEGEN_CRATES_DIR)
 	mv smithy-rs/rust-runtime/build/smithy-rs/rust-runtime/* $(CODEGEN_CRATES_DIR)/
-	mv smithy-rs/aws/sdk/build/aws-sdk/sdk/{aws-config,aws-endpoint,aws-http,aws-sig-auth,aws-sigv4,aws-types,s3,sso,sts} $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/aws-config $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/aws-endpoint $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/aws-http $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/aws-sig-auth $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/aws-sigv4 $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/aws-types $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/s3 $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/sso $(CODEGEN_CRATES_DIR)/
+	mv $(CODEGEN_SDK_DIR)/sts $(CODEGEN_CRATES_DIR)/
 	mv smithy-rs/s3d/build/smithyprojections/s3d/s3/rust-server-codegen $(CODEGEN_SERVER_S3)
 	cd $(CODEGEN_SERVER_S3) && $(TIMER) cargo build
 	cd $(CODEGEN_SERVER_S3) && $(TIMER) cargo test
-	@echo "\nMakefile: ✅ codegen done \n"
+	$(LOG_DONE)
 .PHONY: codegen
+
+submodules:
+	$(LOG_START)
+	cd smithy-rs && git remote -v
+	cd smithy-rs && git branch -avv
+	git submodule status
+	git submodule update --init
+	git submodule status
+	$(LOG_DONE)
+.PHONY: submodules
+
+codegen_init_once: | $(CODEGEN_SERVER_S3)
+.PHONY: codegen_init_once
+
+submodules_init_once: | smithy-rs/README.md
+.PHONY: submodules_init_once
+
+$(CODEGEN_SERVER_S3):
+	$(call LOG,call make codegen)
+	$(TIMER) $(MAKE) codegen
+
+smithy-rs/README.md:
+	$(call LOG,call make submodules)
+	$(TIMER) $(MAKE) submodules
+
+#-------------------------------------#
+# image - containerization buildation #
+#-------------------------------------#
+
+image:
+	$(LOG_START)
+	$(TIMER) $(IMAGE_BUILDER) build . -t $(IMAGE)
+	$(LOG_DONE)
+.PHONY: image
 
 #---------------------#
 # clean - start fresh #
 #---------------------#
 
 clean:
-	@echo "\nMakefile: 👷 running clean ... \n"
+	$(LOG_START)
 	cd smithy-rs && $(TIMER) ./gradlew clean
 	$(TIMER) cargo clean
-	@echo "\nMakefile: ✅ clean done \n"
+	$(LOG_DONE)
 .PHONY: clean
 
 #------------#
@@ -112,6 +149,3 @@ env:
 	@echo "alias s3api='aws --endpoint \$$S3D_ENDPOINT s3api';"
 	@echo "# usage: eval \$$(make env)"
 
-image:
-	$(TIMER) $(IMAGE_BUILDER) build . -t $(IMAGE)
-.PHONY: image

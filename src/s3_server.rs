@@ -42,21 +42,12 @@ pub fn build_router(
             paste::paste! {
                 b = b.[<$op:snake>](move |i: [<$op Input>]| async {
                     info!("[<$op:snake>]: {:?}", i);
-                    type ServerInput = [<$op Input>];
-                    type ServerOutput = [<$op Output>];
-                    type ClientInput = aws_sdk_s3::input::[<$op Input>];
-                    type ClientOutput = aws_sdk_s3::output::[<$op Output>];
-                    // see https://github.com/awslabs/smithy-rs/issues/1099
-                    let into_client = |i: ServerInput| -> ClientInput {
-                        unsafe { std::mem::transmute::<ServerInput, ClientInput>(i) }
-                    };
-                    let into_server = |o: ClientOutput| -> ServerOutput {
-                        unsafe { std::mem::transmute::<ClientOutput, ServerOutput>(o) }
-                    };
+                    let to_client = crate::build_gen::[<conv_to_client_ $op:snake _input>];
+                    let from_client = crate::build_gen::[<conv_from_client_ $op:snake _output>];
                     let r = sm_client
-                        .call(into_client(i).make_operation(s3_client.conf()).await.unwrap())
+                        .call(to_client(i).make_operation(s3_client.conf()).await.unwrap())
                         .await
-                        .map(into_server)
+                        .map(from_client)
                         .map_err(|err| {
                             todo!("unhandled error {:?}", err)
                             // match err {
@@ -76,21 +67,12 @@ pub fn build_router(
             paste::paste! {
                 b = b.[<$op:snake>](move |i: [<$op Input>]| async {
                     info!("[<$op:snake>]: {:?}", i);
-                    type ServerInput = [<$op Input>];
-                    type ServerOutput = [<$op Output>];
-                    type ClientInput = aws_sdk_s3::input::[<$op Input>];
-                    type ClientOutput = aws_sdk_s3::output::[<$op Output>];
-                    // see https://github.com/awslabs/smithy-rs/issues/1099
-                    let into_client = |i: ServerInput| -> ClientInput {
-                        unsafe { std::mem::transmute::<ServerInput, ClientInput>(i) }
-                    };
-                    let into_server = |o: ClientOutput| -> ServerOutput {
-                        unsafe { std::mem::transmute::<ClientOutput, ServerOutput>(o) }
-                    };
+                    let to_client = crate::build_gen::[<conv_to_client_ $op:snake _input>];
+                    let from_client = crate::build_gen::[<conv_from_client_ $op:snake _output>];
                     let r = sm_client
-                        .call(into_client(i).make_operation(s3_client.conf()).await.unwrap())
+                        .call(to_client(i).make_operation(s3_client.conf()).await.unwrap())
                         .await
-                        .map(into_server)
+                        .map(from_client)
                         .unwrap();
                     info!("[<$op:snake>]: {:?}", r);
                     r
@@ -113,23 +95,17 @@ pub fn build_router(
             return qres;
         }
         info!("get_object: read from remote");
-        let into_client = |x: GetObjectInput| -> aws_sdk_s3::input::GetObjectInput {
-            unsafe { std::mem::transmute::<GetObjectInput, aws_sdk_s3::input::GetObjectInput>(x) }
-        };
-        let into_server = |x: aws_sdk_s3::output::GetObjectOutput| -> GetObjectOutput {
-            unsafe {
-                std::mem::transmute::<aws_sdk_s3::output::GetObjectOutput, GetObjectOutput>(x)
-            }
-        };
+        let to_client = crate::build_gen::conv_to_client_get_object_input;
+        let from_client = crate::build_gen::conv_from_client_get_object_output;
         let r = sm_client
             .call(
-                into_client(i2)
+                to_client(i2)
                     .make_operation(s3_client.conf())
                     .await
                     .unwrap(),
             )
             .await
-            .map(into_server)
+            .map(from_client)
             .map_err(|err| todo!("unhandled error {:?}", err));
         info!("get_object: read from remote {:?}", r);
         r
