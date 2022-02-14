@@ -24,7 +24,8 @@ RUN adduser \
     "${USER}"
 
 COPY ./ .
-RUN cargo build --target x86_64-unknown-linux-musl --release
+ENV CARGO_BUILD_TARGET="x86_64-unknown-linux-musl"
+RUN make RELEASE=1
 
 ####################################################################################################
 ## Final image
