@@ -1,4 +1,4 @@
-name: ci
+name: CI
 
 on:
   push:
@@ -21,14 +21,16 @@ env:
 
 jobs:
 
-  codegen:
+  make-codegen:
+    name: Make / Codegen
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Git Checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
-      - uses: actions/cache@v2
-        name: Gradle Cache
+      - name: Cache Gradle
+        uses: actions/cache@v2
         with:
           path: |
             ~/.gradle/caches
@@ -36,66 +38,93 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - uses: Swatinem/rust-cache@v1
-      - run: make codegen
-      - run: tar cvzf codegen.tar.gz smithy-rs/s3d/build/crates/
-      - uses: actions/upload-artifact@v2
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v1
+      - name: Make Codegen
+        run: make codegen
+      - name: Create Codegen Tarball
+        run: tar cvzf codegen.tar.gz smithy-rs/s3d/build/crates/
+      - name: Upload Codegen Tarball
+        uses: actions/upload-artifact@v2
         with:
           name: codegen.tar.gz
           path: codegen.tar.gz
           if-no-files-found: error
 
-  build-debug:
-    needs: codegen
+  make-debug:
+    name: Make Build Debug
+    needs: make-codegen
     runs-on: ubuntu-latest
     steps:
-      # - run: sudo apt-get install -y fuse libfuse-dev pkg-config
-      - uses: actions/checkout@v2
+      # - name: Install Deps
+      #   run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - name: Git Checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
-      - uses: actions/download-artifact@v2
+      - name: Download Codegen Tarball
+        uses: actions/download-artifact@v2
         with:
           name: codegen.tar.gz
-      - run: tar xvzf codegen.tar.gz
-      - uses: Swatinem/rust-cache@v1
-      - run: make build
-      - uses: actions/upload-artifact@v2
+      - name: Extract Codegen Tarball
+        run: tar xvzf codegen.tar.gz
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v1
+      - name: Make Build Debug
+        run: make build
+      - name: Upload Binary
+        uses: actions/upload-artifact@v2
         with:
           name: s3d-debug
           path: target/debug/s3d
           if-no-files-found: error
 
-  build-release:
-    needs: codegen
+  make-release:
+    name: Make Build Release
+    needs: make-codegen
     runs-on: ubuntu-latest
     steps:
-      # - run: sudo apt-get install -y fuse libfuse-dev pkg-config
-      - uses: actions/checkout@v2
+      # - name: Install Deps
+      #   run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - name: Git Checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
-      - uses: actions/download-artifact@v2
+      - name: Download Codegen Tarball
+        uses: actions/download-artifact@v2
         with:
           name: codegen.tar.gz
-      - run: tar xvzf codegen.tar.gz
-      - uses: Swatinem/rust-cache@v1
-      - run: make build RELEASE=1
-      - uses: actions/upload-artifact@v2
+      - name: Extract Codegen Tarball
+        run: tar xvzf codegen.tar.gz
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v1
+      - name: Make Build Release
+        run: make build RELEASE=1
+      - name: Upload Binary
+        uses: actions/upload-artifact@v2
         with:
           name: s3d-release
           path: target/release/s3d
           if-no-files-found: error
 
-  test:
-    needs: codegen
+  make-test:
+    name: Make Test
+    needs: make-codegen
     runs-on: ubuntu-latest
     steps:
-      # - run: sudo apt-get install -y fuse libfuse-dev pkg-config
-      - uses: actions/checkout@v2
+      # - name: Install Deps
+      #   run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - name: Git Checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
-      - uses: actions/download-artifact@v2
+      - name: Download Codegen Tarball
+        uses: actions/download-artifact@v2
         with:
           name: codegen.tar.gz
-      - run: tar xvzf codegen.tar.gz
-      - uses: Swatinem/rust-cache@v1
-      - run: make test
+      - name: Extract Codegen Tarball
+        run: tar xvzf codegen.tar.gz
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v1
+      - name: Make Test
+        run: make test
