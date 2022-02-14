@@ -36,6 +36,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - uses: Swatinem/rust-cache@v1
       - run: make codegen
       - run: tar cvzf codegen.tar.gz smithy-rs/s3d/build/crates/
       - uses: actions/upload-artifact@v2
@@ -61,7 +62,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: s3d-debug
-          path: target/release/s3d
+          path: target/debug/s3d
           if-no-files-found: error
 
   build-release:
