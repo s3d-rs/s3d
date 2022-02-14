@@ -38,4 +38,6 @@ Load shell env to simplify running (run `make env` to show the commands):
 ```bash
 eval $(make env)
 s3d # aliased to ./target/debug/s3d
+eval $(make env RELEASE=1)
+s3d # aliased to ./target/release/s3d
 ```

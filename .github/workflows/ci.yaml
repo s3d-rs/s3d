@@ -1,0 +1,100 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+  pull_request:
+    branches:
+      - "*"
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+
+  codegen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/cache@v2
+        name: Gradle Cache
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - run: make codegen
+      - run: tar cvzf codegen.tar.gz smithy-rs/s3d/build/crates/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: codegen.tar.gz
+          path: codegen.tar.gz
+          if-no-files-found: error
+
+  build-debug:
+    needs: codegen
+    runs-on: ubuntu-latest
+    steps:
+      # - run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v2
+        with:
+          name: codegen.tar.gz
+      - run: tar xvzf codegen.tar.gz
+      - uses: Swatinem/rust-cache@v1
+      - run: make build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: s3d-debug
+          path: target/release/s3d
+          if-no-files-found: error
+
+  build-release:
+    needs: codegen
+    runs-on: ubuntu-latest
+    steps:
+      # - run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v2
+        with:
+          name: codegen.tar.gz
+      - run: tar xvzf codegen.tar.gz
+      - uses: Swatinem/rust-cache@v1
+      - run: make build RELEASE=1
+      - uses: actions/upload-artifact@v2
+        with:
+          name: s3d-release
+          path: target/release/s3d
+          if-no-files-found: error
+
+  test:
+    needs: codegen
+    runs-on: ubuntu-latest
+    steps:
+      # - run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v2
+        with:
+          name: codegen.tar.gz
+      - run: tar xvzf codegen.tar.gz
+      - uses: Swatinem/rust-cache@v1
+      - run: make test
