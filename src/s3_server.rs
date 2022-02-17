@@ -1,10 +1,7 @@
 use crate::write_queue::WriteQueue;
 use s3d_smithy_codegen_server_s3::{
-    // error::*,
-    // model::*,
     input::*,
     operation_registry::*,
-    output::*,
 };
 
 pub type Router = aws_smithy_http_server::Router<hyper::Body>;

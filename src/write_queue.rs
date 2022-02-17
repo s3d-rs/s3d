@@ -3,7 +3,7 @@ use aws_smithy_http::byte_stream::ByteStream;
 use s3d_smithy_codegen_server_s3::{error::*, input::*, output::*};
 use std::path::Path;
 use tokio::{
-    fs::{read_to_string, File},
+    fs::File,
     io::AsyncWriteExt,
 };
 
@@ -76,20 +76,20 @@ impl WriteQueue {
 
     pub async fn get_object(
         &self,
-        mut i: GetObjectInput,
+        i: GetObjectInput,
     ) -> Result<GetObjectOutput, GetObjectError> {
         let fname = self.to_file_name(i.bucket(), i.key());
         let stream = ByteStream::from_path(Path::new(&fname))
             .await
-            .map_err(|err| GetObjectError::NoSuchKey(NoSuchKey::builder().build()))?;
+            .map_err(|_err| GetObjectError::NoSuchKey(NoSuchKey::builder().build()))?;
         Ok(GetObjectOutput::builder().set_body(Some(stream)).build())
     }
 
     pub async fn head_object(
         &self,
-        mut i: HeadObjectInput,
+        _i: HeadObjectInput,
     ) -> Result<HeadObjectOutput, HeadObjectError> {
-        // let fname = self.to_file_name(i.bucket(), i.key()) + ".s3d-object-md.yaml";
+        // let fname = self.to_file_name(_i.bucket(), _i.key()) + ".s3d-object-md.yaml";
         Ok(HeadObjectOutput::builder().build())
     }
 
