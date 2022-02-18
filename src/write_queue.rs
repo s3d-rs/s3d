@@ -1,4 +1,5 @@
 use crate::utils::pipe_stream;
+use crate::fsnotify::consume_fs_events;
 use aws_smithy_http::byte_stream::ByteStream;
 use s3d_smithy_codegen_server_s3::{error::*, input::*, output::*};
 use std::path::Path;
@@ -14,30 +15,9 @@ pub struct WriteQueue {
 }
 
 impl WriteQueue {
+
     pub fn start(&'static self) {
-        tokio::spawn(self.worker());
-    }
-
-    pub async fn worker(&self) {
-        loop {
-            tokio::time::sleep(tokio::time::Duration::from_millis(5000)).await;
-            if let Err(err) = self.work().await {
-                debug!("{}", err);
-            }
-        }
-    }
-
-    pub async fn work(&self) -> anyhow::Result<()> {
-        debug!("Write queue worker running ...");
-        let mut queue = tokio::fs::read_dir(S3D_WRITE_QUEUE_DIR).await?;
-        while let Some(entry) = queue.next_entry().await? {
-            let entry_name_os = entry.file_name();
-            let entry_name = entry_name_os.to_str().unwrap();
-            if let Err(err) = self.push_file(entry_name).await {
-                warn!("{}", err);
-            }
-        }
-        Ok(())
+        tokio::spawn(consume_fs_events(S3D_WRITE_QUEUE_DIR, self));
     }
 
     pub async fn push_file(&self, entry_name: &str) -> anyhow::Result<()> {

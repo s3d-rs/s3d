@@ -87,6 +87,10 @@ aws-config = "0.6.0"
 aws-sdk-s3 = "0.6.0"
 s3d-smithy-codegen-server-s3 = "0.0.1"
 
+# https://github.com/notify-rs/notify
+notify = "5.0.0-pre.13"
+futures = "0.3"
+
 ## patching to use local overides of the smithy-rs crates
 ## can also be added in another file `.cargo/config.toml`
 ## see https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html

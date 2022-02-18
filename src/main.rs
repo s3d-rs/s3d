@@ -9,7 +9,7 @@ pub mod cli;
 pub mod s3_server;
 pub mod utils;
 pub mod write_queue;
-// pub mod fuse;
+pub mod fsnotify;
 
 #[macro_use]
 extern crate log;
