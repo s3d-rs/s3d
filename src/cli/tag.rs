@@ -24,7 +24,7 @@ impl TagCmd {
             .set_tag_set(self.tag.clone().map(|v| {
                 v.iter()
                     .map(|t| {
-                        let mut parts = t.splitn(2, '/');
+                        let mut parts = t.splitn(2, '=');
                         let k = parts.next().map(String::from);
                         let v = parts.next().map(String::from);
                         aws_sdk_s3::model::Tag::builder()

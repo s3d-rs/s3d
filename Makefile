@@ -45,7 +45,7 @@ all: codegen build test
 
 codegen: submodules_init_once
 	$(LOG_START)
-	cd smithy-rs && $(TIMER) ./gradlew \
+	cd smithy-rs && $(TIMER) ./gradlew -i \
 		:rust-runtime:assemble \
 		:aws:sdk:assemble \
 		:s3d:assemble \
@@ -162,6 +162,7 @@ help:
 env:
 	@echo "export S3D_ENDPOINT='http://localhost:33333';"
 	@echo "alias s3d=\"\$$PWD/target/$(MODE)/s3d\";"
+	@echo "alias s3c=\"\$$PWD/target/$(MODE)/s3c\";"
 	@echo "alias s3='aws --endpoint \$$S3D_ENDPOINT s3';"
 	@echo "alias s3api='aws --endpoint \$$S3D_ENDPOINT s3api';"
 	@echo "# usage: eval \$$(make env)"

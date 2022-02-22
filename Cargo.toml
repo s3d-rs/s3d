@@ -13,6 +13,14 @@ license = "Apache-2.0"
 keywords = ["s3", "edge", "object", "storage", "bucket"]
 categories = ["database-implementations", "filesystem", "web-programming::http-server"]
 
+[features]
+
+# enable features by default
+default = ["fuse"]
+# The fuse feature requires `sudo apt-get install -y fuse libfuse-dev pkg-config` or equivalent
+# when enabled it requires the optional dependency on crate `fuser`.
+fuse = ["fuser"]
+
 [badges]
 
 maintenance = { status = "experimental" }
@@ -34,12 +42,11 @@ serde_json = "1.0.78"
 
 ## Runtime crates
 
-hyper = { version = "0.14.16", features = ["full"] }
-tower = { version = "0.4.11", features = ["full"] }
-tokio = { version = "1.15.0", features = ["full"] }
+hyper = { version = "0.14.17", features = ["full"] }
+tower = { version = "0.4.12", features = ["full"] }
+tokio = { version = "1.17.0", features = ["full"] }
 tokio-stream = "0.1.8"
-#fuser = "0.10.0"
-libc = "0.2.114"
+libc = "0.2.119"
 log = "0.4.14"
 env_logger = "0.9.0"
 
@@ -47,7 +54,7 @@ env_logger = "0.9.0"
 
 paste = "1.0.6"
 quote = "1.0.15"
-anyhow = "1.0.53"
+anyhow = "1.0.56"
 async-trait = "0.1.52"
 proc-macro2 = "1.0.36"
 lazy_static = "1.4.0"
@@ -60,31 +67,36 @@ chrono = "0.4.19"
 url = "2.2.2"
 urlencoding = "2.1.0"
 uuid = { version = "0.8.2", features = ["v4"] }
-clap = { version = "3.0.12", features = ["derive", "cargo"] }
+clap = { version = "3.1.6", features = ["derive", "cargo"] }
 
 ## Encoding/decoding crates
 
-serde = { version = "1.0.135", features = ["derive"] }
+serde = { version = "1.0.136", features = ["derive"] }
 serde_yaml = "0.8.23"
 envy = "0.4.2"
 #serde_json = "1.0.78"
 #quick-xml = "0.22.0" # seems to be more popular than other serde_xml* crates
 
+## Optional features crates
+
+fuser = { version = "0.11.0", optional = true }
+
 ## aws smithy crates
 
-aws-smithy-client = { version = "0.36.0", features = ["client-hyper"] }
-aws-smithy-types = "0.36.0"
-aws-smithy-xml = "0.36.0"
-aws-smithy-http = "0.36.0"
-aws-smithy-http-tower = "0.36.0"
-aws-smithy-http-server = "0.36.0"
-aws-http = "0.6.0"
-aws-types = "0.6.0"
-aws-sigv4 = "0.6.0"
-aws-sig-auth = "0.6.0"
-aws-endpoint = "0.6.0"
-aws-config = "0.6.0"
-aws-sdk-s3 = "0.6.0"
+aws-smithy-client = { version = "0.38.0", features = ["client-hyper"] }
+aws-smithy-async = { version = "0.38.0", features = ["rt-tokio"] }
+aws-smithy-types = "0.38.0"
+aws-smithy-xml = "0.38.0"
+aws-smithy-http = "0.38.0"
+aws-smithy-http-tower = "0.38.0"
+aws-smithy-http-server = "0.38.0"
+aws-http = "0.8.0"
+aws-types = "0.8.0"
+aws-sigv4 = "0.8.0"
+aws-sig-auth = "0.8.0"
+aws-endpoint = "0.8.0"
+aws-config = "0.8.0"
+aws-sdk-s3 = "0.8.0"
 s3d-smithy-codegen-server-s3 = "0.0.1"
 
 ## patching to use local overides of the smithy-rs crates
@@ -94,6 +106,7 @@ s3d-smithy-codegen-server-s3 = "0.0.1"
 [patch.crates-io]
 
 aws-smithy-client = { path = "smithy-rs/s3d/build/crates/aws-smithy-client" }
+aws-smithy-async = { path = "smithy-rs/s3d/build/crates/aws-smithy-async" }
 aws-smithy-types = { path = "smithy-rs/s3d/build/crates/aws-smithy-types" }
 aws-smithy-xml = { path = "smithy-rs/s3d/build/crates/aws-smithy-xml" }
 aws-smithy-http = { path = "smithy-rs/s3d/build/crates/aws-smithy-http" }
