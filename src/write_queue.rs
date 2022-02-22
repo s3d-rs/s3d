@@ -1,11 +1,11 @@
-use crate::utils::pipe_stream;
+use crate::utils::{read_file_as_stream, to_internal_err, write_stream_to_file};
 use aws_smithy_http::byte_stream::ByteStream;
-use s3d_smithy_codegen_server_s3::{error::*, input::*, output::*};
-use std::path::Path;
-use tokio::{
-    fs::File,
-    io::AsyncWriteExt,
+use s3d_smithy_codegen_server_s3::{
+    error::{GetObjectError, HeadObjectError, PutObjectError},
+    input::{GetObjectInput, HeadObjectInput, PutObjectInput},
+    output::{GetObjectOutput, HeadObjectOutput, PutObjectOutput},
 };
+use std::path::Path;
 
 const S3D_WRITE_QUEUE_DIR: &str = ".s3d/write_queue";
 
@@ -64,25 +64,20 @@ impl WriteQueue {
     pub async fn put_object(
         &self,
         mut i: PutObjectInput,
-    ) -> Result<PutObjectOutput, anyhow::Error> {
+    ) -> Result<PutObjectOutput, PutObjectError> {
         let fname = self.to_file_name(i.bucket(), i.key());
-        let mut file = File::create(fname).await?;
-        let _num_bytes = pipe_stream(&mut i.body, &mut file).await?;
-        file.flush().await?;
-        file.sync_all().await?;
-        file.shutdown().await?;
-        Ok(PutObjectOutput::builder().e_tag("s3d-etag").build())
+        write_stream_to_file(&fname, &mut i.body)
+            .await
+            .map(|_| PutObjectOutput::builder().e_tag("s3d-etag").build())
+            .map_err(to_internal_err)
     }
 
-    pub async fn get_object(
-        &self,
-        i: GetObjectInput,
-    ) -> Result<GetObjectOutput, GetObjectError> {
+    pub async fn get_object(&self, i: GetObjectInput) -> Result<GetObjectOutput, GetObjectError> {
         let fname = self.to_file_name(i.bucket(), i.key());
-        let stream = ByteStream::from_path(Path::new(&fname))
+        read_file_as_stream(&fname)
             .await
-            .map_err(|_err| GetObjectError::NoSuchKey(NoSuchKey::builder().build()))?;
-        Ok(GetObjectOutput::builder().set_body(Some(stream)).build())
+            .map(|stream| GetObjectOutput::builder().set_body(Some(stream)).build())
+            .map_err(to_internal_err)
     }
 
     pub async fn head_object(

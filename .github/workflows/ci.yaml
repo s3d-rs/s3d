@@ -56,8 +56,8 @@ jobs:
     needs: make-codegen
     runs-on: ubuntu-latest
     steps:
-      # - name: Install Deps
-      #   run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - name: Install Fuse
+        run: sudo apt-get install -y fuse libfuse-dev pkg-config
       - name: Git Checkout
         uses: actions/checkout@v2
         with:
@@ -84,8 +84,8 @@ jobs:
     needs: make-codegen
     runs-on: ubuntu-latest
     steps:
-      # - name: Install Deps
-      #   run: sudo apt-get install -y fuse libfuse-dev pkg-config
+      - name: Install Fuse
+        run: sudo apt-get install -y fuse libfuse-dev pkg-config
       - name: Git Checkout
         uses: actions/checkout@v2
         with:
