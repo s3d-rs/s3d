@@ -9,6 +9,8 @@ title: Architecture
 
 # System Design
 
+![Application models diagram](s3d-diagram.png)
+
 ## Service
 
 `s3d` is meant to run alongside the application(s) and provide transparent access to remote S3 storage:
