@@ -1,4 +1,4 @@
-use crate::utils::to_internal_err;
+use crate::utils::{staticify, to_internal_err};
 use crate::write_queue::WriteQueue;
 use s3d_smithy_codegen_server_s3::{input::*, operation_registry::*};
 
@@ -11,13 +11,13 @@ pub type SMClient = aws_smithy_client::Client<
 
 pub async fn serve() -> anyhow::Result<()> {
     let s3_config = aws_config::load_from_env().await;
-    let s3_client = Box::leak(Box::new(aws_sdk_s3::Client::new(&s3_config)));
+    let s3_client = staticify(aws_sdk_s3::Client::new(&s3_config));
     let sleep_impl = aws_smithy_async::rt::sleep::default_async_sleep();
     let sm_builder = aws_sdk_s3::client::Builder::dyn_https()
         .sleep_impl(sleep_impl)
         .middleware(aws_sdk_s3::middleware::DefaultMiddleware::new());
-    let sm_client = Box::leak(Box::new(sm_builder.build()));
-    let write_queue = Box::leak(Box::new(WriteQueue { s3_client }));
+    let sm_client = staticify(sm_builder.build());
+    let write_queue = staticify(WriteQueue { s3_client });
     write_queue.start();
     let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 33333));
     let router = build_router(sm_client, s3_client, write_queue);

@@ -1,8 +1,9 @@
-target
-build
-
+# s3d ignored files
+target/
 .s3d
 .IGNORE
-.gradle
 
+# smithy-rs ignored files
+build/
+.gradle/
 !smithy-rs/s3d/build/crates

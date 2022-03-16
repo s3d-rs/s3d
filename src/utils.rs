@@ -8,6 +8,14 @@ use tokio::fs::{read_to_string, File};
 use tokio::io::AsyncWriteExt;
 use tokio_stream::StreamExt;
 
+/// staticify uses Box::leak to make a struct with static lifetime.
+/// This is useful for async flows that require structs to live throughout the flow,
+/// where not releasing their memory is fine.
+pub fn staticify<T>(x: T) -> &'static T {
+    Box::leak(Box::new(x))
+}
+
+/// new_s3d_client creates a new s3 client which defaults to connect to the local daemon.
 pub fn new_s3d_client() -> aws_sdk_s3::Client {
     aws_sdk_s3::Client::from_conf({
         let ep = aws_sdk_s3::Endpoint::immutable(
