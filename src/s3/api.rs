@@ -1,4 +1,4 @@
-// use crate::build_gen::generate_code_for_each_s3_op;
+// use crate::build_gen::generate_ops_code;
 use crate::utils::to_internal_err;
 use std::future::Future;
 use std::pin::Pin;

@@ -1,4 +1,8 @@
-/target/
-/codegen/build/
-/.s3d/
+# rust build output
+target/
+
+# local store per dir
+.s3d
+
+# developer drafts
 .IGNORE

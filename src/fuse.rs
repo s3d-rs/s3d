@@ -6,10 +6,10 @@
 //! - To FUSE or Not to FUSE: Performance of User-Space File Systems
 //!   https://www.usenix.org/system/files/conference/fast17/fast17-vangoor.pdf
 
+use crate::config;
+use crate::utils::staticify;
 use fuser::{FileAttr, FileType, Filesystem, Request};
 use std::time::Duration;
-
-use crate::config;
 
 pub const BLOCK_SIZE: u32 = 4096;
 pub const NAMELEN: u32 = 1024;
@@ -29,7 +29,7 @@ impl Fuse {
         }
         info!("Fuse mount enabled");
 
-        let fuse: &'static Fuse = Box::leak(Box::new(Fuse {}));
+        let fuse = staticify(Fuse {});
 
         let mountpoint = config::S3D_FUSE_MOUNT_DIR.as_str();
         if mountpoint.is_empty() {

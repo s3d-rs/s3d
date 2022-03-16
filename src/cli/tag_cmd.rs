@@ -16,8 +16,6 @@ pub struct TagCmd {
 
 impl TagCmd {
     pub async fn run(&self) -> anyhow::Result<()> {
-        debug!("{:?}", self);
-
         let s3 = new_s3d_client();
         let (bucket, key) = parse_bucket_and_key(&self.bucket_and_key)?;
         let tagging = aws_sdk_s3::model::Tagging::builder()

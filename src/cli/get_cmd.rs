@@ -14,8 +14,6 @@ pub struct GetCmd {
 
 impl GetCmd {
     pub async fn run(&self) -> anyhow::Result<()> {
-        debug!("{:?}", self);
-
         let s3 = new_s3d_client();
         let (bucket, key) = parse_bucket_and_key(&self.bucket_and_key)?;
         let mut res = s3.get_object().bucket(bucket).key(key).send().await?;

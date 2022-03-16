@@ -13,8 +13,6 @@ pub struct ListCmd {
 
 impl ListCmd {
     pub async fn run(&self) -> anyhow::Result<()> {
-        debug!("{:?}", self);
-
         let s3 = new_s3d_client();
         let (bucket, prefix) = parse_bucket_and_prefix(&self.bucket_and_prefix)?;
 
