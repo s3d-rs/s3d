@@ -1,4 +1,4 @@
-use crate::utils::{new_s3d_client, parse_bucket_and_key, pipe_stream_to_outfile_or_stdout};
+use crate::utils::{new_s3_client, parse_bucket_and_key, pipe_stream_to_outfile_or_stdout};
 
 /// Get object data to stdout, and meta-data and tags to stderr
 #[derive(clap::Parser, Debug, Clone)]
@@ -14,7 +14,7 @@ pub struct GetCmd {
 
 impl GetCmd {
     pub async fn run(&self) -> anyhow::Result<()> {
-        let s3 = new_s3d_client();
+        let s3 = new_s3_client().await;
         let (bucket, key) = parse_bucket_and_key(&self.bucket_and_key)?;
         let mut res = s3.get_object().bucket(bucket).key(key).send().await?;
 

@@ -1,4 +1,4 @@
-use crate::utils::{byte_stream_from_infile_or_stdin, new_s3d_client, parse_bucket_and_key};
+use crate::utils::{byte_stream_from_infile_or_stdin, new_s3_client, parse_bucket_and_key};
 
 /// Put object from stdin
 #[derive(clap::Parser, Debug, Clone)]
@@ -14,7 +14,7 @@ pub struct PutCmd {
 
 impl PutCmd {
     pub async fn run(&self) -> anyhow::Result<()> {
-        let s3 = new_s3d_client();
+        let s3 = new_s3_client().await;
         let (bucket, key) = parse_bucket_and_key(&self.bucket_and_key)?;
         let body = byte_stream_from_infile_or_stdin(self.infile.as_deref()).await?;
         let res = s3

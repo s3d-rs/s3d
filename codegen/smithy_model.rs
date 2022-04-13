@@ -42,10 +42,10 @@ impl SmithyModel {
     pub fn get_shape_of<'a>(&'a self, member: &'a SmithyMember) -> &'a SmithyShape {
         &self.shapes[&member.target]
     }
-    pub fn get_shape_if<'a>(&'a self, member: Option<&'a SmithyMember>) -> Option<&'a SmithyShape> {
+    pub fn _get_shape_if<'a>(&'a self, member: Option<&'a SmithyMember>) -> Option<&'a SmithyShape> {
         member.map(|m| self.get_shape_of(m))
     }
-    pub fn get_shape_by_key<'a>(&'a self, k: &str) -> &'a SmithyShape {
+    pub fn _get_shape_by_key<'a>(&'a self, k: &str) -> &'a SmithyShape {
         &self.shapes[k]
     }
     pub fn iter_shapes_by_type<'a>(
@@ -54,7 +54,7 @@ impl SmithyModel {
     ) -> impl Iterator<Item = &'a SmithyShape> + 'a {
         self.shapes.values().filter(move |s| s.typ == t)
     }
-    pub fn iter_shapes_with_trait<'a>(
+    pub fn _iter_shapes_with_trait<'a>(
         &'a self,
         t: &'a str,
     ) -> impl Iterator<Item = &'a SmithyShape> + 'a {
@@ -89,7 +89,7 @@ impl SmithyShape {
     pub fn ident(&self) -> Ident {
         format_ident!("{}", self.name)
     }
-    pub fn get_type(&self) -> &str {
+    pub fn _get_type(&self) -> &str {
         self.typ.as_ref()
     }
 }
@@ -127,7 +127,7 @@ impl SmithyMember {
     pub fn set_ident(&self) -> Ident {
         format_ident!("set_{}", self.snake)
     }
-    pub fn get_ident(&self) -> Ident {
+    pub fn _get_ident(&self) -> Ident {
         format_ident!("get_{}", self.snake)
     }
 }
@@ -464,10 +464,14 @@ pub const SM_REQUIRED: &str = "smithy.api#required";
 const SM_DOC: &str = "smithy.api#documentation";
 const _SM_ERROR: &str = "smithy.api#error";
 const _SM_HTTP: &str = "smithy.api#http";
+#[allow(unused)]
 const SM_HTTP_LABEL: &str = "smithy.api#httpLabel";
+#[allow(unused)]
 const SM_HTTP_QUERY: &str = "smithy.api#httpQuery";
+#[allow(unused)]
 const SM_HTTP_HEADER: &str = "smithy.api#httpHeader";
 const _SM_HTTP_PAYLOAD: &str = "smithy.api#httpPayload";
+#[allow(unused)]
 const SM_HTTP_PREFIX_HEADERS: &str = "smithy.api#httpPrefixHeaders";
 const _SM_HTTP_CHECKSUM_REQUIRED: &str = "smithy.api#httpChecksumRequired";
 const _SM_XML_NS: &str = "smithy.api#xmlNamespace";

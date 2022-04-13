@@ -10,32 +10,34 @@
 //! - https://github.com/awslabs/smithy-rs/blob/main/aws/sdk/aws-models/s3.json
 //!
 
-// the build script flow is split to several modules
-mod build_code_writer;
-mod build_gen_cli;
-mod build_gen_converters;
-mod build_smithy_model;
+// the build script flow uses a module not under src
+mod codegen;
 
 use crate::{
-    build_gen_cli::CLIGenerator,
-    build_gen_converters::ConvertersGenerator,
-    build_smithy_model::{FromJson, SmithyModel},
+    codegen::gen_commands::GenCommands,
+    codegen::gen_converters::GenConverters,
+    codegen::smithy_model::{FromJson, SmithyModel},
 };
 use std::{env, path::Path};
 
-/// The main build script
+/// main function of the project's cargo build script
 /// See https://doc.rust-lang.org/cargo/reference/build-scripts.html
 fn main() {
+    println!("cargo:warning=build codegen starting...");
+
     let out_dir = env::var("OUT_DIR").unwrap();
     let out_path = Path::new(out_dir.as_str());
     let model_path = Path::new("smithy-rs/aws/sdk/aws-models/s3.json");
-    println!("cargo:rerun-if-changed={}", model_path.display());
-    println!("cargo:rerun-if-changed=build_code_writer.rs");
-    println!("cargo:rerun-if-changed=build_gen_cli.rs");
-    println!("cargo:rerun-if-changed=build_gen_converters.rs");
-    println!("cargo:rerun-if-changed=build_smithy_model.rs");
+
+    // printing out cargo directives
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=codegen/");
+    println!("cargo:rerun-if-changed={}", model_path.display());
+
+    // load the smithy model and invoke code generators
     let model = SmithyModel::from_json_file(&model_path);
-    CLIGenerator::new(&model, &out_path.join("s3_cli.rs")).generate();
-    ConvertersGenerator::new(&model, &out_path.join("s3_conv.rs")).generate();
+    GenCommands::new(&model, &out_path.join("s3_cli.rs")).generate();
+    GenConverters::new(&model, &out_path.join("s3_conv.rs")).generate();
+
+    println!("cargo:warning=build codegen done.");
 }

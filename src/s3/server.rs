@@ -1,3 +1,4 @@
+use crate::config;
 use crate::utils::{staticify, to_internal_err};
 use crate::write_queue::WriteQueue;
 use s3d_smithy_codegen_server_s3::{input::*, operation_registry::*};
@@ -17,7 +18,10 @@ pub async fn serve() -> anyhow::Result<()> {
         .sleep_impl(sleep_impl)
         .middleware(aws_sdk_s3::middleware::DefaultMiddleware::new());
     let sm_client = staticify(sm_builder.build());
-    let write_queue = staticify(WriteQueue { s3_client });
+    let write_queue = staticify(WriteQueue {
+        s3_client,
+        write_queue_dir: config::S3D_WRITE_QUEUE_DIR.to_string(),
+    });
     write_queue.start();
     let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 33333));
     let router = build_router(sm_client, s3_client, write_queue);
@@ -41,8 +45,8 @@ pub fn build_router(
             paste::paste! {
                 b = b.[<$op:snake>](move |i: [<$op Input>]| async {
                     info!("{}: {:?}", stringify!([<$op:snake>]), i);
-                    let to_client = crate::build_gen::[<conv_to_client_ $op:snake _input>];
-                    let from_client = crate::build_gen::[<conv_from_client_ $op:snake _output>];
+                    let to_client = crate::codegen_include::[<conv_to_client_ $op:snake _input>];
+                    let from_client = crate::codegen_include::[<conv_from_client_ $op:snake _output>];
                     let r = sm_client
                         .call(to_client(i).make_operation(s3_client.conf()).await.unwrap())
                         .await
@@ -69,8 +73,8 @@ pub fn build_router(
             return qres;
         }
         info!("get_object: read from remote");
-        let to_client = crate::build_gen::conv_to_client_get_object_input;
-        let from_client = crate::build_gen::conv_from_client_get_object_output;
+        let to_client = crate::codegen_include::conv_to_client_get_object_input;
+        let from_client = crate::codegen_include::conv_from_client_get_object_output;
         let r = sm_client
             .call(
                 to_client(i2)

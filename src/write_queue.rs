@@ -7,10 +7,9 @@ use s3d_smithy_codegen_server_s3::{
 };
 use std::path::Path;
 
-const S3D_WRITE_QUEUE_DIR: &str = ".s3d/write_queue";
-
 pub struct WriteQueue {
     pub s3_client: &'static aws_sdk_s3::Client,
+    pub write_queue_dir: String,
 }
 
 impl WriteQueue {
@@ -29,7 +28,7 @@ impl WriteQueue {
 
     pub async fn work(&self) -> anyhow::Result<()> {
         debug!("Write queue worker running ...");
-        let mut queue = tokio::fs::read_dir(S3D_WRITE_QUEUE_DIR).await?;
+        let mut queue = tokio::fs::read_dir(&self.write_queue_dir).await?;
         while let Some(entry) = queue.next_entry().await? {
             let entry_name_os = entry.file_name();
             let entry_name = entry_name_os.to_str().unwrap();
@@ -47,7 +46,7 @@ impl WriteQueue {
         let mut parts = bucket_path.splitn(2, '/');
         let bucket = parts.next().unwrap();
         let key = parts.next().unwrap();
-        let fname = format!("{}/{}", S3D_WRITE_QUEUE_DIR, entry_name);
+        let fname = format!("{}/{}", self.write_queue_dir, entry_name);
         let body = ByteStream::from_path(Path::new(&fname)).await?;
         self.s3_client
             .put_object()
@@ -91,7 +90,7 @@ impl WriteQueue {
     pub fn to_file_name(&self, bucket: &str, key: &str) -> String {
         format!(
             "{}/{}",
-            S3D_WRITE_QUEUE_DIR,
+            self.write_queue_dir,
             urlencoding::encode(&format!("{}/{}", bucket, key))
         )
     }

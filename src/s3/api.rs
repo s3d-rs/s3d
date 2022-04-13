@@ -1,4 +1,3 @@
-// use crate::build_gen::generate_ops_code;
 use crate::utils::to_internal_err;
 use std::future::Future;
 use std::pin::Pin;
@@ -37,8 +36,8 @@ macro_rules! s3_op_impl {
             {
                 Box::pin(async move {
                     info!("{}: {:?}", stringify!([<$op:snake>]), i);
-                    let to_client = crate::build_gen::[<conv_to_client_ $op:snake _input>];
-                    let from_client = crate::build_gen::[<conv_from_client_ $op:snake _output>];
+                    let to_client = crate::codegen_include::[<conv_to_client_ $op:snake _input>];
+                    let from_client = crate::codegen_include::[<conv_from_client_ $op:snake _output>];
                     let r = self.sm_client
                         .call(to_client(i).make_operation(self.s3_client.conf()).await.unwrap())
                         .await
@@ -155,7 +154,6 @@ pub trait S3Api {
 pub struct S3ApiClient {
     sm_client: &'static SMClient,
     s3_client: &'static aws_sdk_s3::Client,
-
 }
 
 impl S3Api for S3ApiClient {
