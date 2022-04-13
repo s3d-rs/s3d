@@ -1,12 +1,6 @@
-LOG = @echo "\nMakefile: 🥷  $(1)\n"
-LOG_START = @echo "\nMakefile: 🥷  $@ start ...\n"
-LOG_DONE = @echo "\nMakefile: ✅ $@ done\n"
-TIMER := time
-IMAGE := s3d:dev
-IMAGE_BUILDER := docker
-CODEGEN_CRATES_DIR := smithy-rs/s3d/build/crates
-CODEGEN_SERVER_S3 := $(CODEGEN_CRATES_DIR)/s3d-smithy-codegen-server-s3
-CODEGEN_SDK_DIR := smithy-rs/aws/sdk/build/aws-sdk/sdk
+#--------------#
+# s3d Makefile #
+#--------------#
 
 MODE := debug
 ifeq ($(RELEASE),1)
@@ -16,31 +10,59 @@ endif
 ifdef VERBOSE
 	CARGO_BUILD_FLAGS += -v
 endif
-
+LOG = @echo "\nMakefile: 🥷  "
+LOG_START = @echo "\nMakefile: 🥷  $@ start ...\n"
+LOG_DONE = @echo "\nMakefile: ✅ $@ done\n"
+TIMER := time
+IMAGE := s3d:dev
+IMAGE_BUILDER := docker
+CODEGEN_CRATES_DIR := smithy-rs/s3d/build/crates
+CODEGEN_SERVER_S3 := $(CODEGEN_CRATES_DIR)/s3d-smithy-codegen-server-s3
+CODEGEN_SDK_DIR := smithy-rs/aws/sdk/build/aws-sdk/sdk
 CARGO_BUILD_CMD := $(TIMER) cargo build $(CARGO_BUILD_FLAGS)
 CARGO_TEST_CMD := $(TIMER) cargo test $(CARGO_BUILD_FLAGS) # using same flags as build for now
 
-
-#------------------------#
-# build - default target #
-#------------------------#
+#--------------------------------------------#
+# build - binaries only, the default for dev #
+#--------------------------------------------#
 
 build: codegen_init_once
 	$(LOG_START)
 	$(CARGO_BUILD_CMD)
+	$(LOG) "Built binary: target/$(MODE)/s3"
+	$(LOG) "Built binary: target/$(MODE)/s3d"
 	$(LOG_DONE)
 .PHONY: build
 
-#--------------------------#
-# all - might take a while #
-#--------------------------#
+#------#
+# help #
+#------#
+
+help:
+	@echo ""
+	@echo "Makefile targets:"
+	@echo ""
+	@echo "  build    - (default) binaries only, the default for dev"
+	@echo "  all      - codegen + build + test"
+	@echo "  codegen  - generate code from smithy-rs"
+	@echo "  test     - cargo test"
+	@echo "  image    - build container image"
+	@echo "  clean    - start fresh"
+	@echo "  env      - prints shell commands for dev"
+	@echo ""
+.PHONY: help
+
+
+#------------------------------#
+# all - codegen + build + test #
+#------------------------------#
 
 all: codegen build test
 	$(LOG_DONE)
 .PHONY: all
 
 #-----------------------------------#
-# codegen - generate with smithy-rs #
+# codegen - generate from smithy-rs #
 #-----------------------------------#
 
 codegen: submodules_init_once
@@ -105,12 +127,12 @@ smithy-rs/README.md:
 	$(TIMER) $(MAKE) submodules
 
 #-------------------#
-# test - with cargo #
+# test - cargo test #
 #-------------------#
 
 test:
 	$(LOG_START)
-	@#### no tests yet... ####
+	@#### TODO - no tests yet !!! ####
 	@# $(CARGO_TEST_CMD)
 	@# cd $(CODEGEN_SERVER_S3) && $(CARGO_TEST_CMD)
 	$(LOG_DONE)
@@ -137,33 +159,14 @@ clean:
 	$(LOG_DONE)
 .PHONY: clean
 
-#------------#
-# help - ??? #
-#------------#
 
-help:
-	@echo ""
-	@echo "Makefile targets:"
-	@echo ""
-	@echo "  build    - (default) cargo build"
-	@echo "  all      - codegen + build + test"
-	@echo "  codegen  - builds $(CODEGEN_CRATES_DIR)"
-	@echo "  test     - cargo test"
-	@echo "  clean    - clean the build"
-	@echo "  env      - echos dev envs and aliases"
-	@echo "  help     - show this help"
-	@echo ""
-.PHONY: help
-
-#---------------------------------#
-# env - output shell env commands #
-#---------------------------------#
+#------------------------------------#
+# env - print shell commands for dev # 
+#------------------------------------#
 
 env:
-	@echo "export S3D_ENDPOINT='http://localhost:33333';"
+	@echo "alias s3=\"\$$PWD/target/$(MODE)/s3\";"
 	@echo "alias s3d=\"\$$PWD/target/$(MODE)/s3d\";"
-	@echo "alias s3c=\"\$$PWD/target/$(MODE)/s3c\";"
-	@echo "alias s3='aws --endpoint \$$S3D_ENDPOINT s3';"
-	@echo "alias s3api='aws --endpoint \$$S3D_ENDPOINT s3api';"
+	@echo "alias aws3d='aws --endpoint http://localhost:33333';"
 	@echo "# usage: eval \$$(make env)"
-
+.PHONY: env

@@ -1,3 +1,4 @@
+use crate::config;
 use aws_smithy_http::byte_stream::ByteStream;
 use s3d_smithy_codegen_server_s3::error::InternalServerError;
 use serde::Deserialize;
@@ -15,11 +16,16 @@ pub fn staticify<T>(x: T) -> &'static T {
     Box::leak(Box::new(x))
 }
 
-/// new_s3d_client creates a new s3 client which defaults to connect to the local daemon.
-pub fn new_s3d_client() -> aws_sdk_s3::Client {
+/// new_s3_client creates a new s3 client which defaults to connect to the local daemon.
+pub async fn new_s3_client() -> aws_sdk_s3::Client {
+    if config::S3_ENDPOINT.is_none() {
+        let s3_config = aws_config::load_from_env().await;
+        return aws_sdk_s3::Client::new(&s3_config);
+    }
+
     aws_sdk_s3::Client::from_conf({
         let ep = aws_sdk_s3::Endpoint::immutable(
-            hyper::Uri::from_str("http://localhost:33333").unwrap(),
+            hyper::Uri::from_str(config::S3_ENDPOINT.as_ref().unwrap()).unwrap(),
         );
         let creds = aws_sdk_s3::Credentials::new("s3d", "s3d", None, None, "s3d");
         let region = aws_sdk_s3::Region::new("s3d");
@@ -101,7 +107,7 @@ pub async fn byte_stream_from_infile_or_stdin(infile: Option<&str>) -> anyhow::R
         Some(ref path) => tokio::fs::File::open(path).await?,
         None => tokio::fs::File::from_std(unsafe { std::fs::File::from_raw_fd(0) }),
     };
-    let stream = ByteStream::from_file(file).await?;
+    let stream = ByteStream::read_from().file(file).build().await?;
     Ok(stream)
 }
 

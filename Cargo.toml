@@ -33,11 +33,11 @@ panic = 'abort'
 
 [build-dependencies]
 
-syn = "1.0.90"
-quote = "1.0.17"
-proc-macro2 = "1.0.36"
-serde = { version = "1.0.136", features = ["derive"] }
-serde_json = "1.0.79"
+syn = "1.0.93"
+quote = "1.0.18"
+proc-macro2 = "1.0.38"
+serde = { version = "1.0.137", features = ["derive"] }
+serde_json = "1.0.81"
 
 [dependencies]
 
@@ -45,19 +45,19 @@ serde_json = "1.0.79"
 
 hyper = { version = "0.14.18", features = ["full"] }
 tower = { version = "0.4.12", features = ["full"] }
-tokio = { version = "1.17.0", features = ["full"] }
+tokio = { version = "1.18.2", features = ["full"] }
 tokio-stream = "0.1.8"
-libc = "0.2.121"
-log = "0.4.16"
+libc = "0.2.125"
+log = "0.4.17"
 env_logger = "0.9.0"
 
 ## Rust related crates
 
-quote = "1.0.17"
+quote = "1.0.18"
 paste = "1.0.7"
-anyhow = "1.0.56"
+anyhow = "1.0.57"
 async-trait = "0.1.53"
-proc-macro2 = "1.0.36"
+proc-macro2 = "1.0.38"
 lazy_static = "1.4.0"
 
 ## General purpose crates
@@ -67,15 +67,16 @@ base64 = "0.13.0"
 chrono = "0.4.19"
 url = "2.2.2"
 urlencoding = "2.1.0"
-uuid = { version = "0.8.2", features = ["v4"] }
-clap = { version = "3.1.8", features = ["derive", "cargo"] }
+uuid = { version = "1.0.0", features = ["v4"] }
+clap = { version = "3.1.18", features = ["derive", "cargo"] }
+clap_complete = "3.1.4"
 
 ## Encoding/decoding crates
 
-serde = { version = "1.0.136", features = ["derive"] }
-serde_yaml = "0.8.23"
+serde = { version = "1.0.137", features = ["derive"] }
+serde_yaml = "0.8.24"
 envy = "0.4.2"
-#serde_json = "1.0.79"
+#serde_json = "1.0.81"
 #quick-xml = "0.22.0" # seems to be more popular than other serde_xml* crates
 
 ## Optional features crates
@@ -84,20 +85,22 @@ fuser = { version = "0.11.0", optional = true }
 
 ## aws smithy crates
 
-aws-smithy-client = { version = "0.39.0", features = ["client-hyper"] }
-aws-smithy-async = { version = "0.39.0", features = ["rt-tokio"] }
-aws-smithy-types = "0.39.0"
-aws-smithy-xml = "0.39.0"
-aws-smithy-http = "0.39.0"
-aws-smithy-http-tower = "0.39.0"
-aws-smithy-http-server = "0.39.0"
-aws-http = "0.9.0"
-aws-types = "0.9.0"
-aws-sigv4 = "0.9.0"
-aws-sig-auth = "0.9.0"
-aws-endpoint = "0.9.0"
-aws-config = "0.9.0"
-aws-sdk-s3 = "0.9.0"
+aws-smithy-client = { version = "0.41.0", features = ["client-hyper"] }
+aws-smithy-async = { version = "0.41.0", features = ["rt-tokio"] }
+aws-smithy-types = "0.41.0"
+aws-smithy-xml = "0.41.0"
+aws-smithy-http = "0.41.0"
+aws-smithy-http-tower = "0.41.0"
+aws-smithy-http-server = "0.41.0"
+
+aws-http = "0.11.0"
+aws-types = "0.11.0"
+aws-sigv4 = "0.11.0"
+aws-sig-auth = "0.11.0"
+aws-endpoint = "0.11.0"
+aws-config = "0.11.0"
+aws-sdk-s3 = "0.11.0"
+
 s3d-smithy-codegen-server-s3 = "0.0.1"
 
 ## patching to use local overides of the smithy-rs crates

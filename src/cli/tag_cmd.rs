@@ -1,4 +1,4 @@
-use crate::utils::{new_s3d_client, parse_bucket_and_key};
+use crate::utils::{new_s3_client, parse_bucket_and_key};
 
 /// Get or set tags for bucket or object
 #[derive(clap::Parser, Debug, Clone)]
@@ -6,9 +6,11 @@ pub struct TagCmd {
     /// Set tags for `bucket` or `bucket/key`
     #[clap(name = "bucket[/key]")]
     bucket_and_key: String,
+
     /// Tag `name=value`. Can be used multiple times.
     #[clap(long, short, multiple_occurrences(true))]
     tag: Option<Vec<String>>,
+
     /// Reset previous tags instead of appending
     #[clap(long, short)]
     reset: bool,
@@ -16,7 +18,7 @@ pub struct TagCmd {
 
 impl TagCmd {
     pub async fn run(&self) -> anyhow::Result<()> {
-        let s3 = new_s3d_client();
+        let s3 = new_s3_client().await;
         let (bucket, key) = parse_bucket_and_key(&self.bucket_and_key)?;
         let tagging = aws_sdk_s3::model::Tagging::builder()
             .set_tag_set(self.tag.clone().map(|v| {

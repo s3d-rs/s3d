@@ -1,5 +1,5 @@
-use crate::build_code_writer::CodeWriter;
-use crate::build_smithy_model::*;
+use crate::codegen::utils::CodeWriter;
+use crate::codegen::smithy_model::*;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use std::path::Path;
@@ -7,14 +7,14 @@ use std::path::Path;
 /// ConvertersGenerator generates functions to convert input and output structs
 /// between smithy client and server because they are not the same.
 /// See https://github.com/awslabs/smithy-rs/issues/1099
-pub struct ConvertersGenerator<'a> {
+pub struct GenConverters<'a> {
     pub model: &'a SmithyModel,
     pub writer: CodeWriter,
     pub client_crate: String,
     pub server_crate: String,
 }
 
-impl<'a> ConvertersGenerator<'a> {
+impl<'a> GenConverters<'a> {
     pub fn new(model: &'a SmithyModel, out_path: &Path) -> Self {
         Self {
             model,

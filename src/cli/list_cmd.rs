@@ -1,4 +1,4 @@
-use crate::utils::{new_s3d_client, parse_bucket_and_prefix};
+use crate::utils::{new_s3_client, parse_bucket_and_prefix};
 use aws_smithy_types::date_time::Format;
 
 /// List buckets or objects
@@ -13,7 +13,7 @@ pub struct ListCmd {
 
 impl ListCmd {
     pub async fn run(&self) -> anyhow::Result<()> {
-        let s3 = new_s3d_client();
+        let s3 = new_s3_client().await;
         let (bucket, prefix) = parse_bucket_and_prefix(&self.bucket_and_prefix)?;
 
         if bucket.is_empty() {
@@ -34,13 +34,19 @@ impl ListCmd {
                 .send()
                 .await?;
             for it in res.common_prefixes.unwrap_or_default() {
-                println!("<----- PREFIX -----> {}", it.prefix().unwrap());
+                println!(
+                    "{:.^20} {:.>12} {}",
+                    "PREFIX",
+                    "",
+                    it.prefix().unwrap()
+                );
             }
             for it in res.contents.unwrap_or_default() {
                 println!(
-                    "{} {}",
+                    "{:>20} {:.>12} {}",
                     it.last_modified().unwrap().fmt(Format::DateTime).unwrap(),
-                    it.key().unwrap()
+                    it.size(),
+                    it.key().unwrap(),
                 );
             }
         }

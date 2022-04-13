@@ -1,15 +1,15 @@
-use crate::build_code_writer::CodeWriter;
-use crate::build_smithy_model::*;
+use crate::codegen::utils::CodeWriter;
+use crate::codegen::smithy_model::*;
 use quote::{format_ident, quote};
 use std::{collections::HashSet, path::Path};
 
-/// CLIGenerator generates clap commands for every operation.
-pub struct CLIGenerator<'a> {
+/// GenCommands generates clap commands for every operation.
+pub struct GenCommands<'a> {
     pub model: &'a SmithyModel,
     pub writer: CodeWriter,
 }
 
-impl<'a> CLIGenerator<'a> {
+impl<'a> GenCommands<'a> {
     pub fn new(model: &'a SmithyModel, out_path: &Path) -> Self {
         Self {
             model,
