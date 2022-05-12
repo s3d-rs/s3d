@@ -12,6 +12,7 @@ pub async fn main() -> anyhow::Result<()> {
 #[derive(clap::Parser, Debug, Clone)]
 #[clap(name = "s3")]
 #[clap(about = "S3 CLI tool for applications or services that need to access S3 buckets (with/out the s3d daemon)")]
+#[clap(version = clap::crate_version!())]
 #[clap(setting = clap::AppSettings::DeriveDisplayOrder)]
 pub struct CLI {
     /// subcommand
