@@ -78,8 +78,8 @@ jobs:
       - name: Upload Binary
         uses: actions/upload-artifact@v2
         with:
-          name: s3c-debug
-          path: target/debug/s3c
+          name: s3-debug
+          path: target/debug/s3
           if-no-files-found: error
 
   make-release:
@@ -112,8 +112,8 @@ jobs:
       - name: Upload Binary
         uses: actions/upload-artifact@v2
         with:
-          name: s3c-release
-          path: target/release/s3c
+          name: s3-release
+          path: target/release/s3
           if-no-files-found: error
 
   make-test:
