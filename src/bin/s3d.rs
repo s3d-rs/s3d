@@ -12,6 +12,7 @@ pub async fn main() -> anyhow::Result<()> {
 #[derive(clap::Parser, Debug, Clone)]
 #[clap(name = "s3d")]
 #[clap(about = clap::crate_description!())]
+#[clap(version = clap::crate_version!())]
 #[clap(setting = clap::AppSettings::DeriveDisplayOrder)]
 pub struct Daemon {}
 

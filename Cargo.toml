@@ -3,7 +3,7 @@
 [package]
 
 name = "s3d"
-version = "0.0.1-alpha.5"
+version = "0.0.1"
 authors = ["guymguym"]
 edition = "2021"
 description = "s3d is a daemon for data access using S3 API. A modern cousin of nfsd, ftpd, httpd, etc. It is designed to be simple, tiny, blazing fast, and portable in order to fit in a variety of environments from developer machines, containers, kubernetes, edge devices, etc."
