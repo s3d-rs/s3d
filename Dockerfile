@@ -38,7 +38,7 @@ WORKDIR /s3d
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 COPY --from=builder /s3d/target/x86_64-unknown-linux-musl/release/s3d ./
-COPY --from=builder /s3d/target/x86_64-unknown-linux-musl/release/s3c ./
+COPY --from=builder /s3d/target/x86_64-unknown-linux-musl/release/s3 ./
 
 # Use an unprivileged user
 USER s3d:s3d

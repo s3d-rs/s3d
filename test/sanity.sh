@@ -9,9 +9,9 @@ function LOG() {
     { echo -e "\n----------> sanity: $@\n"; } 2>/dev/null
 }
 
-function S3C() {
-    LOG "🚀 s3c $@"
-    eval "./target/debug/s3c $@"
+function S3() {
+    LOG "🚀 s3 $@"
+    eval "./target/debug/s3 $@"
 }
 
 function CURL() {
@@ -30,15 +30,15 @@ function AWSCLI() {
     aws --endpoint $EP "$@"
 }
 
-function test_s3c() {
-    LOG "▶️ test_s3c ..."
-    S3C ls
-    S3C ls $BKT
-    S3C put $BKT/README.md "<README.md"
+function test_s3() {
+    LOG "▶️ test_s3 ..."
+    S3 ls
+    S3 ls $BKT
+    S3 put $BKT/README.md "<README.md"
     sleep 10
-    S3C get $BKT/README.md ">/dev/null"
-    S3C ls $BKT
-    LOG "✅ test_s3c done"
+    S3 get $BKT/README.md ">/dev/null"
+    S3 ls $BKT
+    LOG "✅ test_s3 done"
 }
 
 function test_curl_client() {
@@ -81,7 +81,7 @@ function test_awscli_s3api() {
 }
 
 
-test_s3c
+test_s3
 #test_curl_client
 #test_awscli_s3
 #test_awscli_s3api
